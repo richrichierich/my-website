@@ -9,10 +9,10 @@ output:
 
 This is my JSC370 Final Project website.
 ```{r setup, echo=FALSE}
-knitr::opts_chunk$set(eval = TRUE, echo  = FALSE, warning = FALSE)
+knitr::opts_chunk$set(eval = TRUE, echo  = FALSE, warning = FALSE, include = TRUE)
 ```
 
-```{r include = FALSE}
+```{r include = TRUE}
 source("process_starbucks_data.R")
 
 p1 <- plot_ly(data = sb_nutr, 

@@ -12,7 +12,7 @@ This is my JSC370 Final Project website.
 knitr::opts_chunk$set(eval = TRUE, echo  = FALSE, warning = FALSE)
 ```
 
-```{r, echo = FALSE, include = FALSE}
+```{r include = FALSE}
 source("process_starbucks_data.R")
 
 p1 <- plot_ly(data = sb_nutr, 

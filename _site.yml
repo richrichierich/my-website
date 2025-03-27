@@ -4,3 +4,9 @@ navbar:
   left:
     - text: "Home"
       href: index.html
+output:
+  html_document:
+    theme: cosmo
+    include:
+      after_body: footer.html
+    css: styles.css

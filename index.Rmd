@@ -8,3 +8,69 @@ output:
 ---
 
 This is my JSC370 Final Project website.
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(eval = TRUE, echo  = FALSE, warning = FALSE)
+```
+
+```{r, echo = FALSE, include = FALSE}
+source("process_starbucks_data.R")
+
+p1 <- plot_ly(data = sb_nutr, 
+        x = ~`Carb. (g)`, 
+        y = ~Calories, 
+        color = ~Category,  # Coloring by food or beverage category
+        type = "scatter", 
+        mode = "markers",
+        marker = list(size = 8, opacity = 0.6)) %>%
+  layout(title = "Calories vs. Carbohydrates in Starbucks Menu Items",
+         xaxis = list(title = "Carbohydrates (g)"),
+         yaxis = list(title = "Calories"),
+         legend = list(title = list(text = "Category")))
+
+
+
+
+
+# Tokenizing menu items into words and counting occurrences
+top_10_words <- sb_nutr |> 
+  unnest_tokens(word, `Item`) |>  # Assuming 'Beverage_category' contains item names
+  anti_join(stop_words, by = "word") |>  # Remove common stopwords
+  count(word, sort = TRUE) |> 
+  slice_max(n, n = 10) |> 
+  pull(word)  # Extract as a vector
+
+# Create a regex pattern to match any of the top 10 words
+pattern <- paste0("\\b(", paste(top_10_words, collapse = "|"), ")\\b")
+
+# Filter for menu items that contain at least one of the top 10 words
+sb_nutr_filtered <- sb_nutr |> 
+  filter(str_detect(`Item`, regex(pattern, ignore_case = TRUE))) |> 
+  mutate(matching_word = str_extract(`Item`, regex(pattern, ignore_case = TRUE)))
+
+
+p2 <- plot_ly(data = sb_nutr_filtered, 
+        x = ~`Carb. (g)`, 
+        y = ~Calories, 
+        color = ~Category,  # Coloring by food or beverage category
+        text = ~paste("Word:", matching_word, "<br>Item:", `Item`), 
+        type = "scatter", 
+        mode = "markers",
+        marker = list(size = 8, opacity = 0.7)) %>%
+  layout(title = "Calories vs. Carbohydrates for Items Containing Top 10 Words",
+         xaxis = list(title = "Carbohydrates (g)"),
+         yaxis = list(title = "Calories"),
+         legend = list(title = list(text = "Category")),
+         hovermode = "compare")  # Enables comparing hover tooltips
+
+```
+
+
+```{r echo=FALSE}
+p1
+```
+
+### Figure 2
+
+```{r echo=FALSE}
+p2
+```

@@ -3,7 +3,7 @@ navbar:
   title: "My Website"
   left:
     - text: "Home"
-      href: _site/index.html
+      href: index.html
 output:
   html_document:
     theme: cosmo

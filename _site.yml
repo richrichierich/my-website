@@ -3,4 +3,4 @@ navbar:
   title: "My Website"
   left:
     - text: "Home"
-      href: index.html
+      href: _site/index.html

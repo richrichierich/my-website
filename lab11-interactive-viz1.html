@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Lab 11 - Interactive Visualization</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.10.4/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My Website</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Lab 11 - Interactive Visualization</h1>
+
+</div>
+
+
+<div id="learning-goals" class="section level1">
+<h1>Learning Goals</h1>
+<ul>
+<li>Read in and process Starbucks data.</li>
+<li>Create interactive visualizations of different types using
+<code>plot_ly()</code> and <code>ggplotly()</code>.</li>
+<li>Customize the hoverinfo and other plot features.</li>
+<li>Create a Choropleth map using <code>plot_geo()</code>.</li>
+</ul>
+</div>
+<div id="lab-description" class="section level1">
+<h1>Lab Description</h1>
+<p>We will work with two Starbucks datasets, one on the store locations
+(global) and one for the nutritional data for their food and drink
+items. We will do some text analysis of the menu items.</p>
+</div>
+<div id="deliverables" class="section level1">
+<h1>Deliverables</h1>
+<p>Upload an html file to Quercus and make sure the figures remain
+interactive.</p>
+</div>
+<div id="steps" class="section level1">
+<h1>Steps</h1>
+<div id="install-and-load-libraries" class="section level3">
+<h3>0. Install and load libraries</h3>
+</div>
+<div id="read-in-the-data" class="section level3">
+<h3>1. Read in the data</h3>
+<ul>
+<li>There are 4 datasets to read in, Starbucks locations, Starbucks
+nutrition, US population by state, and US state abbreviations. All of
+them are on the course GitHub.</li>
+</ul>
+<pre class="r"><code>sb_locs &lt;- read_csv(&quot;https://raw.githubusercontent.com/JSC370/JSC370-2025/refs/heads/main/data/starbucks/starbucks-locations.csv&quot;)</code></pre>
+<pre><code>## Rows: 25600 Columns: 12
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (10): Store Number, Store Name, Ownership Type, Street Address, City, St...
+## dbl  (2): Longitude, Latitude
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>sb_nutr &lt;- read_csv(&quot;https://raw.githubusercontent.com/JSC370/JSC370-2025/refs/heads/main/data/starbucks/starbucks-menu-nutrition.csv&quot;)</code></pre>
+<pre><code>## Rows: 205 Columns: 7
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (2): Item, Category
+## dbl (5): Calories, Fat (g), Carb. (g), Fiber (g), Protein (g)
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>usa_pop &lt;- read_csv(&quot;https://raw.githubusercontent.com/JSC370/JSC370-2025/refs/heads/main/data/starbucks/us_state_pop.csv&quot;)</code></pre>
+<pre><code>## Rows: 55 Columns: 2
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (1): state
+## dbl (1): population
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>usa_states&lt;-read_csv(&quot;https://raw.githubusercontent.com/JSC370/JSC370-2025/refs/heads/main/data/starbucks/states.csv&quot;)</code></pre>
+<pre><code>## Rows: 51 Columns: 2
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (2): State, Abbreviation
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div id="look-at-the-data" class="section level3">
+<h3>2. Look at the data</h3>
+<ul>
+<li>Inspect each dataset to look at variable names and ensure it was
+imported correctly.</li>
+</ul>
+<pre class="r"><code>sb_locs</code></pre>
+<pre><code>## # A tibble: 25,600 × 12
+##    `Store Number` `Store Name`           `Ownership Type` `Street Address` City 
+##    &lt;chr&gt;          &lt;chr&gt;                  &lt;chr&gt;            &lt;chr&gt;            &lt;chr&gt;
+##  1 47370-257954   Meritxell, 96          Licensed         Av. Meritxell, … Ando…
+##  2 22331-212325   Ajman Drive Thru       Licensed         1 Street 69, Al… Ajman
+##  3 47089-256771   Dana Mall              Licensed         Sheikh Khalifa … Ajman
+##  4 22126-218024   Twofour 54             Licensed         Al Salam Street  Abu …
+##  5 17127-178586   Al Ain Tower           Licensed         Khaldiya Area, … Abu …
+##  6 17688-182164   Dalma Mall, Ground Fl… Licensed         Dalma Mall, Mus… Abu …
+##  7 18182-182165   Dalma Mall, Level 1    Licensed         Dalma Mall, Mus… Abu …
+##  8 23359-229184   Debenhams Yas Mall     Licensed         Yas Island       Abu …
+##  9 30781-99022    Khalidiya Street       Licensed         Khalidiya St.    Abu …
+## 10 20423-205465   Eastern Mangroves      Licensed         Al Salam Street… Abu …
+## # ℹ 25,590 more rows
+## # ℹ 7 more variables: `State/Province` &lt;chr&gt;, Country &lt;chr&gt;, Postcode &lt;chr&gt;,
+## #   `Phone Number` &lt;chr&gt;, Timezone &lt;chr&gt;, Longitude &lt;dbl&gt;, Latitude &lt;dbl&gt;</code></pre>
+<pre class="r"><code>sb_nutr</code></pre>
+<pre><code>## # A tibble: 205 × 7
+##    Item        Category Calories `Fat (g)` `Carb. (g)` `Fiber (g)` `Protein (g)`
+##    &lt;chr&gt;       &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;         &lt;dbl&gt;
+##  1 Chonga Bag… Food          300         5          50           3            12
+##  2 8-Grain Ro… Food          380         6          70           7            10
+##  3 Almond Cro… Food          410        22          45           3            10
+##  4 Apple Frit… Food          460        23          56           2             7
+##  5 Banana Nut… Food          420        22          52           2             6
+##  6 Blueberry … Food          380        16          53           1             6
+##  7 Blueberry … Food          420        17          61           2             5
+##  8 Butter Cro… Food          240        12          28           1             5
+##  9 Butterfly … Food          350        22          38           0             2
+## 10 Cheese Dan… Food          320        16          36           1             8
+## # ℹ 195 more rows</code></pre>
+<pre class="r"><code>usa_pop</code></pre>
+<pre><code>## # A tibble: 55 × 2
+##    state                population
+##    &lt;chr&gt;                     &lt;dbl&gt;
+##  1 Alabama                 4779736
+##  2 Alaska                   710231
+##  3 Arizona                 6392017
+##  4 Arkansas                2915918
+##  5 California             37253956
+##  6 Colorado                5029196
+##  7 Connecticut             3574097
+##  8 Delaware                 897934
+##  9 District of Columbia     601723
+## 10 Florida                18801310
+## # ℹ 45 more rows</code></pre>
+<pre class="r"><code>usa_states</code></pre>
+<pre><code>## # A tibble: 51 × 2
+##    State                Abbreviation
+##    &lt;chr&gt;                &lt;chr&gt;       
+##  1 Alabama              AL          
+##  2 Alaska               AK          
+##  3 Arizona              AZ          
+##  4 Arkansas             AR          
+##  5 California           CA          
+##  6 Colorado             CO          
+##  7 Connecticut          CT          
+##  8 Delaware             DE          
+##  9 District of Columbia DC          
+## 10 Florida              FL          
+## # ℹ 41 more rows</code></pre>
+</div>
+<div id="format-and-merge-the-data" class="section level3">
+<h3>3. Format and merge the data</h3>
+<ul>
+<li>Subset Starbucks data to the US.</li>
+<li>Create counts of Starbucks stores by state.</li>
+<li>Merge population in with the store count by state.</li>
+<li>Inspect the range values for each variable.</li>
+</ul>
+<pre class="r"><code># Subset Starbucks locations to only those in the US
+sb_usa &lt;- sb_locs |&gt; filter(Country == &quot;US&quot;)
+
+# Count Starbucks stores by state
+sb_locs_state &lt;- sb_usa |&gt;
+  group_by(`State/Province`) |&gt;
+  summarize(store_count = n())
+
+# Rename the state abbreviation column in the states dataset
+usa_states &lt;- usa_states |&gt; rename(state = State, abbreviation = Abbreviation)
+
+# Merge state population data with state abbreviations
+usa_pop_abbr &lt;- full_join(usa_pop, usa_states, by = c(&quot;state&quot; = &quot;state&quot;))
+
+# Merge the Starbucks store count data with the population dataset
+sb_locs_state &lt;- full_join(sb_locs_state, usa_pop_abbr, 
+                           by = c(&quot;State/Province&quot; = &quot;abbreviation&quot;))
+
+# Inspect the range of values
+summary(sb_locs_state)</code></pre>
+<pre><code>##  State/Province      store_count        state             population      
+##  Length:55          Min.   :   8.0   Length:55          Min.   :   56882  
+##  Class :character   1st Qu.:  56.5   Class :character   1st Qu.: 1344331  
+##  Mode  :character   Median : 123.0   Mode  :character   Median : 3751351  
+##                     Mean   : 266.8                      Mean   : 5677621  
+##                     3rd Qu.: 332.0                      3rd Qu.: 6515716  
+##                     Max.   :2821.0                      Max.   :37253956  
+##                     NA&#39;s   :4</code></pre>
+</div>
+<div id="use-ggplotly-for-eda" class="section level3">
+<h3>4. Use <code>ggplotly</code> for EDA</h3>
+<p>Answer the following questions:</p>
+<ul>
+<li><p>Are the number of Starbucks proportional to the population of a
+state? (scatterplot)</p></li>
+<li><p>Is the caloric distribution of Starbucks menu items different for
+drinks and food? (histogram)</p></li>
+<li><p>What are the top 20 words in Starbucks menu items? (bar
+plot)</p></li>
+</ul>
+<pre class="r"><code># Scatterplot of Starbucks stores vs. population
+p1 &lt;- sb_locs_state |&gt; 
+  ggplot(aes(x = population, y = store_count, text = state)) + 
+  geom_point(color = &quot;darkgreen&quot;, alpha = 0.6) + 
+  geom_smooth(method = &quot;lm&quot;, se = FALSE, color = &quot;blue&quot;) +
+  labs(title = &quot;Starbucks Stores vs. State Population&quot;,
+       x = &quot;Population&quot;,
+       y = &quot;Number of Starbucks Stores&quot;) +
+  theme_minimal()
+
+ggplotly(p1, tooltip = &quot;text&quot;)</code></pre>
+<pre><code>## `geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
+<pre><code>## Warning: Removed 4 rows containing non-finite outside the scale range
+## (`stat_smooth()`).</code></pre>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-0e38cbebff3f47c48b86" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-0e38cbebff3f47c48b86">{"x":{"data":[{"x":[710231,4779736,2915918,6392017,37253956,5029196,3574097,601723,897934,18801310,9687653,1360301,3046355,1567582,12830632,6483802,2853118,4339367,4533372,6547629,5773552,1328361,9883640,5303925,5988927,2967297,989415,9535483,672591,1826341,1316470,8791894,2059179,2700551,19378102,11536504,3751351,3831074,12702379,1052567,4625364,814180,6346105,25145561,2763885,8001024,625741,6724540,5686986,1852994,563626,3194000,106977,165768,56882],"y":[49,85,55,488,2821,481,123,91,25,694,326,99,89,67,575,221,94,116,84,273,257,30,283,184,188,32,36,338,13,58,29,261,76,253,645,378,79,359,357,27,131,25,180,1042,101,432,8,757,145,25,23,null,null,null,null],"text":["Alaska","Alabama","Arkansas","Arizona","California","Colorado","Connecticut","District of Columbia","Delaware","Florida","Georgia","Hawaii","Iowa","Idaho","Illinois","Indiana","Kansas","Kentucky","Louisiana","Massachusetts","Maryland","Maine","Michigan","Minnesota","Missouri","Mississippi","Montana","North Carolina","North Dakota","Nebraska","New Hampshire","New Jersey","New Mexico","Nevada","New York","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Virginia","Vermont","Washington","Wisconsin","West Virginia","Wyoming","Puerto Rico","Virgin Islands","Guam","Northern Mariana Islands"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,100,0,1)","opacity":0.59999999999999998,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,100,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"visible":false,"showlegend":false,"xaxis":null,"yaxis":null,"hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.762557077625573,"r":7.3059360730593621,"b":40.182648401826498,"l":48.949771689497723},"font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"Starbucks Stores vs. State Population","font":{"color":"rgba(0,0,0,1)","family":"","size":17.534246575342465},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-1802971.7000000002,39113809.700000003],"tickmode":"array","ticktext":["0e+00","1e+07","2e+07","3e+07"],"tickvals":[0,10000000,20000000,30000000],"categoryorder":"array","categoryarray":["0e+00","1e+07","2e+07","3e+07"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Population","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-132.65000000000001,2961.6500000000001],"tickmode":"array","ticktext":["0","1000","2000"],"tickvals":[0,1000.0000000000001,2000],"categoryorder":"array","categoryarray":["0","1000","2000"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"Number of Starbucks Stores","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"2b3f1d19195d":{"x":{},"y":{},"text":{},"type":"scatter"},"2b3f5ad03797":{"x":{},"y":{},"text":{}}},"cur_data":"2b3f1d19195d","visdat":{"2b3f1d19195d":["function (y) ","x"],"2b3f5ad03797":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<ul>
+<li>4a) Answer: There is a strong positive correlation between
+population and number of starbucks stores.</li>
+</ul>
+<pre class="r"><code># Ensure there&#39;s a category column to distinguish drinks vs. food
+p2 &lt;- sb_nutr |&gt; 
+  ggplot(aes(x = Calories, fill = Category)) + 
+  geom_histogram(bins = 30, position = &quot;identity&quot;, alpha = 0.6) + 
+  labs(title = &quot;Caloric Distribution: Drinks vs. Food&quot;,
+       x = &quot;Calories&quot;,
+       y = &quot;Count&quot;,
+       fill = &quot;Category&quot;) +
+  theme_minimal()
+
+ggplotly(p2)</code></pre>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-f3b3e2333399f8318b87" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-f3b3e2333399f8318b87">{"x":{"data":[{"orientation":"v","width":[22.413793103448278,22.41379310344827,22.41379310344827,22.413793103448285,22.413793103448285,22.413793103448256,22.413793103448313,22.413793103448256,22.413793103448256,22.413793103448256,22.413793103448256,22.413793103448256,22.41379310344837,22.413793103448256,22.41379310344837,22.413793103448256,22.413793103448256,22.41379310344837,22.413793103448256,22.41379310344837,22.413793103448256,22.413793103448256,22.413793103448256,22.413793103448143,22.41379310344837,22.41379310344837,22.41379310344837,22.41379310344837,22.41379310344837,22.41379310344837],"base":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"x":[0,22.413793103448278,44.827586206896548,67.241379310344826,89.65517241379311,112.06896551724138,134.48275862068965,156.89655172413796,179.31034482758622,201.72413793103453,224.13793103448279,246.55172413793105,268.9655172413793,291.37931034482762,313.79310344827593,336.20689655172418,358.62068965517244,381.0344827586207,403.44827586206901,425.86206896551732,448.27586206896558,470.68965517241384,493.10344827586209,515.51724137931035,537.93103448275861,560.34482758620697,582.75862068965512,605.17241379310349,627.58620689655163,650],"y":[11,3,3,12,5,8,18,6,5,5,1,4,3,3,2,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0],"text":["count: 11<br />Calories:   0.00000<br />Category: Drinks","count:  3<br />Calories:  22.41379<br />Category: Drinks","count:  3<br />Calories:  44.82759<br />Category: Drinks","count: 12<br />Calories:  67.24138<br />Category: Drinks","count:  5<br />Calories:  89.65517<br />Category: Drinks","count:  8<br />Calories: 112.06897<br />Category: Drinks","count: 18<br />Calories: 134.48276<br />Category: Drinks","count:  6<br />Calories: 156.89655<br />Category: Drinks","count:  5<br />Calories: 179.31034<br />Category: Drinks","count:  5<br />Calories: 201.72414<br />Category: Drinks","count:  1<br />Calories: 224.13793<br />Category: Drinks","count:  4<br />Calories: 246.55172<br />Category: Drinks","count:  3<br />Calories: 268.96552<br />Category: Drinks","count:  3<br />Calories: 291.37931<br />Category: Drinks","count:  2<br />Calories: 313.79310<br />Category: Drinks","count:  0<br />Calories: 336.20690<br />Category: Drinks","count:  2<br />Calories: 358.62069<br />Category: Drinks","count:  0<br />Calories: 381.03448<br />Category: Drinks","count:  0<br />Calories: 403.44828<br />Category: Drinks","count:  1<br />Calories: 425.86207<br />Category: Drinks","count:  0<br />Calories: 448.27586<br />Category: Drinks","count:  0<br />Calories: 470.68966<br />Category: Drinks","count:  0<br />Calories: 493.10345<br />Category: Drinks","count:  0<br />Calories: 515.51724<br />Category: Drinks","count:  0<br />Calories: 537.93103<br />Category: Drinks","count:  0<br />Calories: 560.34483<br />Category: Drinks","count:  0<br />Calories: 582.75862<br />Category: Drinks","count:  0<br />Calories: 605.17241<br />Category: Drinks","count:  0<br />Calories: 627.58621<br />Category: Drinks","count:  0<br />Calories: 650.00000<br />Category: Drinks"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(248,118,109,0.6)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Drinks","legendgroup":"Drinks","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[22.413793103448278,22.41379310344827,22.41379310344827,22.413793103448285,22.413793103448285,22.413793103448256,22.413793103448313,22.413793103448256,22.413793103448256,22.413793103448256,22.413793103448256,22.413793103448256,22.41379310344837,22.413793103448256,22.41379310344837,22.413793103448256,22.413793103448256,22.41379310344837,22.413793103448256,22.41379310344837,22.413793103448256,22.413793103448256,22.413793103448256,22.413793103448143,22.41379310344837,22.41379310344837,22.41379310344837,22.41379310344837,22.41379310344837,22.41379310344837],"base":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"x":[0,22.413793103448278,44.827586206896548,67.241379310344826,89.65517241379311,112.06896551724138,134.48275862068965,156.89655172413796,179.31034482758622,201.72413793103453,224.13793103448279,246.55172413793105,268.9655172413793,291.37931034482762,313.79310344827593,336.20689655172418,358.62068965517244,381.0344827586207,403.44827586206901,425.86206896551732,448.27586206896558,470.68965517241384,493.10344827586209,515.51724137931035,537.93103448275861,560.34482758620697,582.75862068965512,605.17241379310349,627.58620689655163,650],"y":[0,0,0,0,4,1,1,2,9,2,2,5,4,7,5,7,10,8,4,9,5,11,7,2,1,3,0,2,1,1],"text":["count:  0<br />Calories:   0.00000<br />Category: Food","count:  0<br />Calories:  22.41379<br />Category: Food","count:  0<br />Calories:  44.82759<br />Category: Food","count:  0<br />Calories:  67.24138<br />Category: Food","count:  4<br />Calories:  89.65517<br />Category: Food","count:  1<br />Calories: 112.06897<br />Category: Food","count:  1<br />Calories: 134.48276<br />Category: Food","count:  2<br />Calories: 156.89655<br />Category: Food","count:  9<br />Calories: 179.31034<br />Category: Food","count:  2<br />Calories: 201.72414<br />Category: Food","count:  2<br />Calories: 224.13793<br />Category: Food","count:  5<br />Calories: 246.55172<br />Category: Food","count:  4<br />Calories: 268.96552<br />Category: Food","count:  7<br />Calories: 291.37931<br />Category: Food","count:  5<br />Calories: 313.79310<br />Category: Food","count:  7<br />Calories: 336.20690<br />Category: Food","count: 10<br />Calories: 358.62069<br />Category: Food","count:  8<br />Calories: 381.03448<br />Category: Food","count:  4<br />Calories: 403.44828<br />Category: Food","count:  9<br />Calories: 425.86207<br />Category: Food","count:  5<br />Calories: 448.27586<br />Category: Food","count: 11<br />Calories: 470.68966<br />Category: Food","count:  7<br />Calories: 493.10345<br />Category: Food","count:  2<br />Calories: 515.51724<br />Category: Food","count:  1<br />Calories: 537.93103<br />Category: Food","count:  3<br />Calories: 560.34483<br />Category: Food","count:  0<br />Calories: 582.75862<br />Category: Food","count:  2<br />Calories: 605.17241<br />Category: Food","count:  1<br />Calories: 627.58621<br />Category: Food","count:  1<br />Calories: 650.00000<br />Category: Food"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(0,191,196,0.6)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Food","legendgroup":"Food","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.762557077625573,"r":7.3059360730593621,"b":40.182648401826498,"l":37.260273972602747},"font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"Caloric Distribution: Drinks vs. Food","font":{"color":"rgba(0,0,0,1)","family":"","size":17.534246575342465},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-44.827586206896555,694.82758620689663],"tickmode":"array","ticktext":["0","200","400","600"],"tickvals":[0,200,399.99999999999994,600],"categoryorder":"array","categoryarray":["0","200","400","600"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Calories","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.90000000000000002,18.899999999999999],"tickmode":"array","ticktext":["0","5","10","15"],"tickvals":[0,5.0000000000000009,10,15],"categoryorder":"array","categoryarray":["0","5","10","15"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"Count","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Category","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"2b3f65c20f1d":{"x":{},"fill":{},"type":"bar"}},"cur_data":"2b3f65c20f1d","visdat":{"2b3f65c20f1d":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<ul>
+<li>4b) Answer: Food, on average, has higher calories. There is a large
+amount of drinks with 0 calories.</li>
+</ul>
+<pre class="r"><code># Tokenizing menu items into words
+top_words &lt;- sb_nutr |&gt; 
+  unnest_tokens(word, `Item`) |&gt;  # Assuming &#39;Beverage_category&#39; contains item names
+  anti_join(stop_words, by = &quot;word&quot;) |&gt;  # Remove common stopwords
+  count(word, sort = TRUE) |&gt; 
+  slice_max(n, n = 20)
+
+# Bar plot of top 20 words
+p3 &lt;- top_words |&gt; 
+  ggplot(aes(x = reorder(word, n), y = n, fill = word)) + 
+  geom_col(show.legend = FALSE) + 
+  coord_flip() +
+  labs(title = &quot;Top 20 Words in Starbucks Menu Items&quot;,
+       x = &quot;Word&quot;,
+       y = &quot;Count&quot;) +
+  theme_minimal()
+
+ggplotly(p3)</code></pre>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-dbd94094b51b61ce608c" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-dbd94094b51b61ce608c">{"x":{"data":[{"orientation":"h","width":0.89999999999999858,"base":0,"x":[11],"y":[11],"text":"reorder(word, n): black<br />n: 11<br />word: black","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"black","legendgroup":"black","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.89999999999999858,"base":0,"x":[26],"y":[20],"text":"reorder(word, n): bottled<br />n: 26<br />word: bottled","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(236,130,57,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"bottled","legendgroup":"bottled","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.89999999999999858,"base":0,"x":[11],"y":[12],"text":"reorder(word, n): cake<br />n: 11<br />word: cake","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(219,142,0,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"cake","legendgroup":"cake","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.90000000000000036,"base":0,"x":[10],"y":[6],"text":"reorder(word, n): chicken<br />n: 10<br />word: chicken","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(199,152,0,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"chicken","legendgroup":"chicken","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.89999999999999858,"base":0,"x":[18],"y":[18],"text":"reorder(word, n): chocolate<br />n: 18<br />word: chocolate","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(174,162,0,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"chocolate","legendgroup":"chocolate","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.89999999999999858,"base":0,"x":[13],"y":[17],"text":"reorder(word, n): coffee<br />n: 13<br />word: coffee","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(143,170,0,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"coffee","legendgroup":"coffee","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.90000000000000036,"base":0,"x":[10],"y":[7],"text":"reorder(word, n): cookie<br />n: 10<br />word: cookie","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(100,178,0,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"cookie","legendgroup":"cookie","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.89999999999999858,"base":0,"x":[12],"y":[14],"text":"reorder(word, n): egg<br />n: 12<br />word: egg","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(0,184,27,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"egg","legendgroup":"egg","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.89999999999999858,"base":0,"x":[32],"y":[22],"text":"reorder(word, n): iced<br />n: 32<br />word: iced","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(0,189,92,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"iced","legendgroup":"iced","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.89999999999999947,"base":0,"x":[10],"y":[8],"text":"reorder(word, n): latte<br />n: 10<br />word: latte","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(0,192,133,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"latte","legendgroup":"latte","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.89999999999999991,"base":0,"x":[8],"y":[1],"text":"reorder(word, n): macchiato<br />n:  8<br />word: macchiato","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(0,193,167,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"macchiato","legendgroup":"macchiato","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.89999999999999858,"base":0,"x":[10],"y":[9],"text":"reorder(word, n): mocha<br />n: 10<br />word: mocha","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"mocha","legendgroup":"mocha","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.90000000000000013,"base":0,"x":[8],"y":[2],"text":"reorder(word, n): organic<br />n:  8<br />word: organic","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(0,186,222,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"organic","legendgroup":"organic","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.89999999999999858,"base":0,"x":[11],"y":[13],"text":"reorder(word, n): protein<br />n: 11<br />word: protein","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(0,178,243,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"protein","legendgroup":"protein","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.90000000000000036,"base":0,"x":[9],"y":[4],"text":"reorder(word, n): salad<br />n:  9<br />word: salad","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(0,166,255,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"salad","legendgroup":"salad","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.89999999999999858,"base":0,"x":[19],"y":[19],"text":"reorder(word, n): sandwich<br />n: 19<br />word: sandwich","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(123,150,255,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"sandwich","legendgroup":"sandwich","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.90000000000000036,"base":0,"x":[8],"y":[3],"text":"reorder(word, n): shaken<br />n:  8<br />word: shaken","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(179,133,255,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"shaken","legendgroup":"shaken","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.89999999999999858,"base":0,"x":[12],"y":[15],"text":"reorder(word, n): starbucks<br />n: 12<br />word: starbucks","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(216,116,253,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"starbucks","legendgroup":"starbucks","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.89999999999999858,"base":0,"x":[26],"y":[21],"text":"reorder(word, n): tazo<br />n: 26<br />word: tazo","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(239,103,235,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"tazo","legendgroup":"tazo","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.89999999999999858,"base":0,"x":[12],"y":[16],"text":"reorder(word, n): tea<br />n: 12<br />word: tea","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(253,97,211,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"tea","legendgroup":"tea","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.90000000000000036,"base":0,"x":[9],"y":[5],"text":"reorder(word, n): vanilla<br />n:  9<br />word: vanilla","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(255,99,182,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"vanilla","legendgroup":"vanilla","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":0.89999999999999858,"base":0,"x":[10],"y":[10],"text":"reorder(word, n): white<br />n: 10<br />word: white","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(255,107,148,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"white","legendgroup":"white","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.762557077625573,"r":7.3059360730593621,"b":40.182648401826498,"l":78.173515981735179},"font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"Top 20 Words in Starbucks Menu Items","font":{"color":"rgba(0,0,0,1)","family":"","size":17.534246575342465},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-1.6000000000000001,33.600000000000001],"tickmode":"array","ticktext":["0","10","20","30"],"tickvals":[0,10,20,30],"categoryorder":"array","categoryarray":["0","10","20","30"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Count","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,22.600000000000001],"tickmode":"array","ticktext":["macchiato","organic","shaken","salad","vanilla","chicken","cookie","latte","mocha","white","black","cake","protein","egg","starbucks","tea","coffee","chocolate","sandwich","bottled","tazo","iced"],"tickvals":[1,2,3,4,5,6.0000000000000009,7,8,9,10,11,12,12.999999999999998,14.000000000000002,15.000000000000002,16,17,18,19,20,21,22],"categoryorder":"array","categoryarray":["macchiato","organic","shaken","salad","vanilla","chicken","cookie","latte","mocha","white","black","cake","protein","egg","starbucks","tea","coffee","chocolate","sandwich","bottled","tazo","iced"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"Word","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"2b3f341d05ee":{"x":{},"y":{},"fill":{},"type":"bar"}},"cur_data":"2b3f341d05ee","visdat":{"2b3f341d05ee":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<ul>
+<li>4c) Answer: Top 20 words are iced, tazo, bottled, sandwich,
+chocolate, coffee, tea, starbucks, egg, protein, cake, black, white,
+mocha, latte, cookie, chicken, vanilla, salad, shaken, organic, and
+macchiato.</li>
+</ul>
+</div>
+<div id="scatterplots-using-plot_ly" class="section level3">
+<h3>5. Scatterplots using <code>plot_ly()</code></h3>
+<ul>
+<li>Create a scatterplot using <code>plot_ly()</code> representing the
+relationship between calories and carbs. Color the points by category
+(food or beverage). Is there a relationship, and do food or beverages
+tend to have more calories?</li>
+</ul>
+<pre class="r"><code># Scatterplot of Calories vs. Carbs using plot_ly
+plot_ly(data = sb_nutr, 
+        x = ~`Carb. (g)`, 
+        y = ~Calories, 
+        color = ~Category,  # Coloring by food or beverage category
+        type = &quot;scatter&quot;, 
+        mode = &quot;markers&quot;,
+        marker = list(size = 8, opacity = 0.6)) %&gt;%
+  layout(title = &quot;Calories vs. Carbohydrates in Starbucks Menu Items&quot;,
+         xaxis = list(title = &quot;Carbohydrates (g)&quot;),
+         yaxis = list(title = &quot;Calories&quot;),
+         legend = list(title = list(text = &quot;Category&quot;)))</code></pre>
+<pre><code>## Warning in RColorBrewer::brewer.pal(N, &quot;Set2&quot;): minimal value for n is 3, returning requested palette with 3 different levels
+## Warning in RColorBrewer::brewer.pal(N, &quot;Set2&quot;): minimal value for n is 3, returning requested palette with 3 different levels</code></pre>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-cd0f71538e65961ed16d" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-cd0f71538e65961ed16d">{"x":{"visdat":{"2b3f51187b0e":["function () ","plotlyVisDat"]},"cur_data":"2b3f51187b0e","attrs":{"2b3f51187b0e":{"x":{},"y":{},"mode":"markers","marker":{"size":8,"opacity":0.59999999999999998},"color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Calories vs. Carbohydrates in Starbucks Menu Items","xaxis":{"domain":[0,1],"automargin":true,"title":"Carbohydrates (g)"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Calories"},"legend":{"title":{"text":"Category"}},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[0,0,0,0,0,0,0,0,0,2,0,8,8,8,11,5,11,14,15,15,15,13,15,15,17,17,17,17,5,18,19,24,27,27,28,14,24,31,31,31,31,12,21,21,21,21,13,23,35,35,35,35,35,23,35,35,35,35,35,28,38,37,38,38,37,38,18,19,30,19,19,34,34,28,28,33,36,35,32,37,37,40,34,60,42,47,60,47,53,64,53,45],"y":[0,0,5,5,5,5,5,5,5,10,10,30,30,30,45,45,50,60,60,60,60,60,60,60,70,70,70,70,70,80,80,90,90,90,110,110,110,120,120,120,120,120,130,130,130,130,130,140,140,140,140,140,140,140,140,140,140,140,140,140,150,150,150,150,150,150,180,190,190,190,190,200,200,200,200,210,230,250,250,250,250,260,260,280,290,300,300,320,320,350,360,430],"mode":"markers","marker":{"color":"rgba(102,194,165,1)","size":8,"opacity":0.59999999999999998,"line":{"color":"rgba(102,194,165,1)"}},"type":"scatter","name":"Drinks","textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[50,70,45,56,52,53,61,28,38,36,30,42,60,38,43,64,56,58,57,36,64,53,46,55,54,14,53,14,30,45,29,68,47,64,40,39,56,36,39,18,56,63,61,45,67,44,44,57,23,28,44,45,45,27,80,34,33,7,34,29,9,62,43,52,44,47,44,31,46,53,67,49,34,45,40,53,42,23,23,23,24,32,18,28,40,28,43,28,41,43,42,9,13,35,33,57,42,37,35,42,57,49,80,47,31,55,39,42,12,6,38,5,24],"y":[300,380,410,460,420,380,420,240,350,320,170,310,440,330,390,490,390,270,390,360,420,430,410,490,440,100,290,90,200,240,250,470,310,350,290,330,480,360,330,120,280,410,420,360,370,330,330,330,180,200,300,360,390,270,600,300,360,130,430,470,170,620,300,360,440,600,530,350,500,560,570,420,450,460,460,520,360,170,160,180,180,370,280,160,490,320,220,230,500,410,450,310,170,500,290,500,420,510,470,480,480,480,650,420,460,560,240,240,180,190,340,90,90],"mode":"markers","marker":{"color":"rgba(141,160,203,1)","size":8,"opacity":0.59999999999999998,"line":{"color":"rgba(141,160,203,1)"}},"type":"scatter","name":"Food","textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<ul>
+<li><p>5a) Answer: There seems to be a positive correlation betweenc
+carbs and calories. Food, on average, has higher calories than
+drinks.</p></li>
+<li><p>Repeat this scatterplot but for the items that include the top 10
+words. Color again by category, and add hoverinfo specifying the word in
+the item name. Add layout information to title the chart and the axes,
+and enable <code>hovermode = "compare"</code>.</p></li>
+<li><p>What are the top 10 words and is the plot much different than
+above?</p></li>
+</ul>
+<pre class="r"><code># Tokenizing menu items into words and counting occurrences
+top_10_words &lt;- sb_nutr |&gt; 
+  unnest_tokens(word, `Item`) |&gt;  # Assuming &#39;Beverage_category&#39; contains item names
+  anti_join(stop_words, by = &quot;word&quot;) |&gt;  # Remove common stopwords
+  count(word, sort = TRUE) |&gt; 
+  slice_max(n, n = 10) |&gt; 
+  pull(word)  # Extract as a vector
+
+# Create a regex pattern to match any of the top 10 words
+pattern &lt;- paste0(&quot;\\b(&quot;, paste(top_10_words, collapse = &quot;|&quot;), &quot;)\\b&quot;)
+
+# Filter for menu items that contain at least one of the top 10 words
+sb_nutr_filtered &lt;- sb_nutr |&gt; 
+  filter(str_detect(`Item`, regex(pattern, ignore_case = TRUE))) |&gt; 
+  mutate(matching_word = str_extract(`Item`, regex(pattern, ignore_case = TRUE)))
+
+
+plot_ly(data = sb_nutr_filtered, 
+        x = ~`Carb. (g)`, 
+        y = ~Calories, 
+        color = ~Category,  # Coloring by food or beverage category
+        text = ~paste(&quot;Word:&quot;, matching_word, &quot;&lt;br&gt;Item:&quot;, `Item`), 
+        type = &quot;scatter&quot;, 
+        mode = &quot;markers&quot;,
+        marker = list(size = 8, opacity = 0.7)) %&gt;%
+  layout(title = &quot;Calories vs. Carbohydrates for Items Containing Top 10 Words&quot;,
+         xaxis = list(title = &quot;Carbohydrates (g)&quot;),
+         yaxis = list(title = &quot;Calories&quot;),
+         legend = list(title = list(text = &quot;Category&quot;)),
+         hovermode = &quot;compare&quot;)  # Enables comparing hover tooltips</code></pre>
+<pre><code>## Warning in RColorBrewer::brewer.pal(N, &quot;Set2&quot;): minimal value for n is 3, returning requested palette with 3 different levels
+## Warning in RColorBrewer::brewer.pal(N, &quot;Set2&quot;): minimal value for n is 3, returning requested palette with 3 different levels</code></pre>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-6df3b4fc75310b74656e" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-6df3b4fc75310b74656e">{"x":{"visdat":{"2b3f24b671ab":["function () ","plotlyVisDat"]},"cur_data":"2b3f24b671ab","attrs":{"2b3f24b671ab":{"x":{},"y":{},"text":{},"mode":"markers","marker":{"size":8,"opacity":0.69999999999999996},"color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Calories vs. Carbohydrates for Items Containing Top 10 Words","xaxis":{"domain":[0,1],"automargin":true,"title":"Carbohydrates (g)"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Calories"},"legend":{"title":{"text":"Category"}},"hovermode":"compare","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[0,0,2,0,8,8,8,11,5,11,14,15,15,15,13,15,15,17,17,17,17,18,19,24,27,27,24,31,31,31,31,21,21,21,21,13,23,35,35,35,35,35,23,35,35,35,35,35,28,38,37,38,38,37,38,30,34,34,33,36,37,34,60,47,47,53,64,53,45],"y":[0,5,10,10,30,30,30,45,45,50,60,60,60,60,60,60,60,70,70,70,70,80,80,90,90,90,110,120,120,120,120,130,130,130,130,130,140,140,140,140,140,140,140,140,140,140,140,140,140,150,150,150,150,150,150,190,200,200,210,230,250,260,280,300,320,320,350,360,430],"text":["Word: Iced <br>Item: Iced Coffee","Word: Iced <br>Item: Iced Coffee","Word: Starbucks <br>Item: Starbucks Iced Coffee Unsweetened","Word: Coffee <br>Item: Clover  Brewed Coffee","Word: Iced <br>Item: Teavana  Shaken Iced Black Tea","Word: Iced <br>Item: Teavana  Shaken Iced Green Tea","Word: Iced <br>Item: Teavana Shaken Iced Passion Tango™ Tea","Word: Starbucks <br>Item: Cool Lime Starbucks Refreshers™ Beverage","Word: Starbucks <br>Item: Starbucks Doubleshot  on Ice Beverage","Word: Starbucks <br>Item: Starbucks  Iced Coffee Light Sweetened","Word: Starbucks <br>Item: Very Berry Hibiscus Starbucks Refreshers™ Beverage","Word: Tazo <br>Item: Tazo  Bottled Berry Blossom White","Word: Tazo <br>Item: Tazo  Bottled Organic Iced Black Tea","Word: Iced <br>Item: Teavana  Shaken Iced Peach Green Tea","Word: Starbucks <br>Item: Starbucks  Iced Coffee Caramel","Word: Tazo <br>Item: Tazo  Bottled Berry Blossom White","Word: Tazo <br>Item: Tazo  Bottled Organic Iced Black Tea","Word: Tazo <br>Item: Tazo  Bottled Iced Passion","Word: Iced <br>Item: Teavana  Shaken Iced Black Tea Lemonade","Word: Iced <br>Item: Teavana  Shaken Iced Green Tea Lemonade","Word: Tazo <br>Item: Tazo  Bottled Iced Passion","Word: Starbucks <br>Item: Strawberry Acai Starbucks Refreshers™ Beverage","Word: Tea <br>Item: Shaken Sweet Tea","Word: Iced <br>Item: Teavana  Shaken Iced Passion Tango™ Tea Lemonade","Word: Starbucks <br>Item: Starbucks Refreshers™ Raspberry Pomegranate","Word: Starbucks <br>Item: Starbucks Refreshers™ Strawberry Lemonade","Word: Coffee <br>Item: Coffee Light Frappuccino  Blended Coffee","Word: Tazo <br>Item: Tazo  Bottled Lemon Ginger","Word: Tazo <br>Item: Tazo  Bottled Organic Iced Green Tea","Word: Tazo <br>Item: Tazo  Bottled Lemon Ginger","Word: Tazo <br>Item: Tazo  Bottled Organic Iced Green Tea","Word: Iced <br>Item: Iced Espresso Classics - Vanilla Latte","Word: Iced <br>Item: Iced Espresso Classics - Caramel Macchiato","Word: Iced <br>Item: Iced Espresso Classics - Vanilla Latte","Word: Iced <br>Item: Iced Espresso Classics - Caramel Macchiato","Word: Iced <br>Item: Iced Caff  Latte","Word: Iced <br>Item: Iced Espresso Classics - Caffe Mocha","Word: Tazo <br>Item: Tazo  Bottled Black with Lemon","Word: Tazo <br>Item: Tazo  Bottled Brambleberry","Word: Tazo <br>Item: Tazo  Bottled Organic Black Lemonade","Word: Tazo <br>Item: Tazo  Bottled Plum Pomegranate","Word: Tazo <br>Item: Tazo  Bottled White Cranberry","Word: Iced <br>Item: Iced Espresso Classics - Caffe Mocha","Word: Tazo <br>Item: Tazo  Bottled Black with Lemon","Word: Tazo <br>Item: Tazo  Bottled Brambleberry","Word: Tazo <br>Item: Tazo  Bottled Organic Black Lemonade","Word: Tazo <br>Item: Tazo  Bottled Plum Pomegranate","Word: Tazo <br>Item: Tazo  Bottled White Cranberry","Word: Coffee <br>Item: Mocha Light Frappuccino  Blended Coffee","Word: Tazo <br>Item: Tazo  Bottled Black Mango","Word: Tazo <br>Item: Tazo  Bottled Giant Peach","Word: Tazo <br>Item: Tazo  Bottled Tazoberry","Word: Tazo <br>Item: Tazo  Bottled Black Mango","Word: Tazo <br>Item: Tazo  Bottled Giant Peach","Word: Tazo <br>Item: Tazo  Bottled Tazoberry","Word: Iced <br>Item: Iced Vanilla Latte","Word: Starbucks <br>Item: Starbucks  Doubleshot Protein Vanilla","Word: Iced <br>Item: Iced Cinnamon Dolce Latte","Word: Starbucks <br>Item: Starbucks  Doubleshot Protein Dark Chocolate","Word: Iced <br>Item: Iced Caff  Mocha","Word: Iced <br>Item: Iced Caramel Macchiato","Word: Iced <br>Item: Iced Coconutmilk Mocha Macchiato","Word: Coffee <br>Item: Mocha Frappuccino  Blended Coffee","Word: Iced <br>Item: Iced White Chocolate Mocha","Word: Chocolate <br>Item: Hot Chocolate","Word: Chocolate <br>Item: Chocolate Smoothie","Word: Coffee <br>Item: Cinnamon Dolce Frappuccino  Blended Coffee","Word: Chocolate <br>Item: White Chocolate Mocha","Word: Starbucks <br>Item: Starbucks  Signature Hot Chocolate"],"mode":"markers","marker":{"color":"rgba(102,194,165,1)","size":8,"opacity":0.69999999999999996,"line":{"color":"rgba(102,194,165,1)"}},"type":"scatter","name":"Drinks","textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[30,42,60,38,43,64,57,46,55,54,68,61,67,23,80,34,34,29,43,52,47,44,31,46,49,34,45,40,53,42,23,23,23,24,32,18,40,28,41,43,42,9,13,35,33,42,35,42,80,31,12],"y":[170,310,440,330,390,490,390,410,490,440,470,420,370,180,600,300,430,470,300,360,600,530,350,500,420,450,460,460,520,360,170,160,180,180,370,280,490,230,500,410,450,310,170,500,290,420,470,480,650,460,180],"text":["Word: Chocolate <br>Item: Chewy Chocolate Cookie","Word: Chocolate <br>Item: Chocolate Chip Cookie","Word: Chocolate <br>Item: Chocolate Chunk Muffin","Word: Chocolate <br>Item: Chocolate Croissant","Word: Chocolate <br>Item: Chocolate Hazelnut Croissant","Word: Chocolate <br>Item: Chocolate Marble Loaf Cake","Word: Coffee <br>Item: Classic Coffee Cake","Word: Chocolate <br>Item: Double Chocolate Brownie","Word: Chocolate <br>Item: Double Chocolate Chunk Brownie","Word: Chocolate <br>Item: Double Chocolate Loaf Cake","Word: Iced <br>Item: Iced Lemon Pound Cake","Word: Cake <br>Item: Raspberry Swirl Loaf Cake","Word: Coffee <br>Item: Reduced-Fat Cinnamon Swirl Coffee Cake","Word: Cake <br>Item: Strawberry Cake Pop","Word: Sandwich <br>Item: Strawberries & Jam Sandwich","Word: Sandwich <br>Item: Burrata & Basil Pesto Small Sandwich","Word: Sandwich <br>Item: Cubano Sandwich","Word: Protein <br>Item: Farmers' Market Protein Box","Word: Sandwich <br>Item: Herbed Chicken & Fig Spread Small Sandwich","Word: Sandwich <br>Item: Honey BBQ Sriracha Chicken Sandwich","Word: Sandwich <br>Item: Roasted Turkey & Dill Havarti Sandwich","Word: Sandwich <br>Item: Seared Steak & Cheddar Sandwich","Word: Sandwich <br>Item: Slow-Roasted Ham & Beecher's Flagship Cheese Small Sandwich","Word: Sandwich <br>Item: Smoked Mozzarella & Roasted Pepper Sandwich","Word: Protein <br>Item: BBQ Chicken Protein Box","Word: Protein <br>Item: Cheese & Fruit Protein Box","Word: Protein <br>Item: Chicken Wrap Protein Box","Word: Protein <br>Item: Eggs & Cheese Protein Box","Word: Protein <br>Item: PB&J Protein Box","Word: Protein <br>Item: Smoked Turkey Protein Box","Word: Cake <br>Item: Birthday Cake Pop","Word: Chocolate <br>Item: Chocolate Cake Pop","Word: Chocolate <br>Item: Chocolate Chip Cookie Dough Cake Pop","Word: Cake <br>Item: Pirate Cake Pop","Word: Egg <br>Item: Bacon Gouda & Egg Breakfast Sandwich","Word: Sandwich <br>Item: Certified Gluten-Free Breakfast Sandwich","Word: Egg <br>Item: Double-Smoked Bacon Cheddar & Egg Sandwich","Word: Egg <br>Item: Reduced-Fat Turkey Bacon & Cage Free Egg White Breakfast Sandwich","Word: Egg <br>Item: Sausage Cheddar & Egg Breakfast Sandwich","Word: Egg <br>Item: Seared Steak Egg & Tomatillo Wrap","Word: Egg <br>Item: Slow-Roasted Ham Swiss & Egg Breakfast Sandwich","Word: Egg <br>Item: Sous Vide Egg Bites: Bacon & Gruyere","Word: Egg <br>Item: Sous Vide Egg Bites: Egg White & Red Pepper","Word: Egg <br>Item: Spicy Chorizo  Monterey Jack & Egg Breakfast Sandwich","Word: Egg <br>Item: Spinach Feta & Cage Free Egg White Breakfast Wrap","Word: Protein <br>Item: Chicken & Quinoa Protein Bowl with Black Beans and Greens","Word: Sandwich <br>Item: Chicken BLT Salad Sandwich","Word: Egg <br>Item: Egg Salad Sandwich","Word: Protein <br>Item: Lentils & Vegetable Protein Bowl with Brown Rice","Word: Sandwich <br>Item: Turkey & Havarti Sandwich","Word: Chocolate <br>Item: Justin's Chocolate Hazelnut Butter"],"mode":"markers","marker":{"color":"rgba(141,160,203,1)","size":8,"opacity":0.69999999999999996,"line":{"color":"rgba(141,160,203,1)"}},"type":"scatter","name":"Food","textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<ul>
+<li>5b) Answer: The same trend is present.</li>
+</ul>
+</div>
+<div id="plot_ly-boxplots" class="section level3">
+<h3>6. <code>plot_ly</code> Boxplots</h3>
+<ul>
+<li>Create a boxplot of all of the nutritional variables in groups by
+the 10 item words.</li>
+<li>Which top word has the most calories? Which top word has the most
+protein?</li>
+</ul>
+<pre class="r"><code># Convert data to long format for boxplot visualization
+sb_nutr_long &lt;- sb_nutr_filtered |&gt; 
+  select(matching_word, Calories, `Fat (g)`, `Carb. (g)`, `Fiber (g)`, `Protein (g)`) |&gt;  # Select only nutrition columns
+  pivot_longer(cols = Calories:`Protein (g)`,  # Convert all nutrient columns into long format
+               names_to = &quot;Nutrient&quot;, 
+               values_to = &quot;Value&quot;)
+plot_ly() |&gt; 
+  # Boxplot for Calories (Primary Y-Axis)
+  add_trace(data = sb_nutr_long |&gt; filter(Nutrient == &quot;Calories&quot;), 
+            x = ~matching_word, 
+            y = ~Value, 
+            type = &quot;box&quot;, 
+            name = &quot;Calories&quot;,
+            marker = list(color = &quot;red&quot;),
+            yaxis = &quot;y1&quot;) |&gt; 
+  
+  # Boxplots for Other Nutrients (Secondary Y-Axis)
+  add_trace(data = sb_nutr_long |&gt; filter(Nutrient != &quot;Calories&quot;), 
+            x = ~matching_word, 
+            y = ~Value, 
+            type = &quot;box&quot;, 
+            name = ~Nutrient,
+            color = ~Nutrient,
+            yaxis = &quot;y2&quot;) |&gt; 
+
+  layout(title = &quot;Nutritional Distribution of Top 10 Starbucks Menu Words&quot;,
+         xaxis = list(title = &quot;Top 10 Words in Menu Items&quot;),
+         
+         # Primary Y-Axis (Calories)
+         yaxis = list(title = &quot;Calories&quot;, 
+                      side = &quot;left&quot;,
+                      showgrid = FALSE),
+         
+         # Secondary Y-Axis (Other Nutrients)
+         yaxis2 = list(title = &quot;Other Nutrients (g)&quot;, 
+                       overlaying = &quot;y&quot;, 
+                       side = &quot;right&quot;,
+                       showgrid = FALSE),
+         
+         boxmode = &quot;group&quot;)</code></pre>
+<pre><code>## Warning: &#39;layout&#39; objects don&#39;t have these attributes: &#39;boxmode&#39;
+## Valid attributes include:
+## &#39;_deprecated&#39;, &#39;activeshape&#39;, &#39;annotations&#39;, &#39;autosize&#39;, &#39;autotypenumbers&#39;, &#39;calendar&#39;, &#39;clickmode&#39;, &#39;coloraxis&#39;, &#39;colorscale&#39;, &#39;colorway&#39;, &#39;computed&#39;, &#39;datarevision&#39;, &#39;dragmode&#39;, &#39;editrevision&#39;, &#39;editType&#39;, &#39;font&#39;, &#39;geo&#39;, &#39;grid&#39;, &#39;height&#39;, &#39;hidesources&#39;, &#39;hoverdistance&#39;, &#39;hoverlabel&#39;, &#39;hovermode&#39;, &#39;images&#39;, &#39;legend&#39;, &#39;mapbox&#39;, &#39;margin&#39;, &#39;meta&#39;, &#39;metasrc&#39;, &#39;modebar&#39;, &#39;newshape&#39;, &#39;paper_bgcolor&#39;, &#39;plot_bgcolor&#39;, &#39;polar&#39;, &#39;scene&#39;, &#39;selectdirection&#39;, &#39;selectionrevision&#39;, &#39;separators&#39;, &#39;shapes&#39;, &#39;showlegend&#39;, &#39;sliders&#39;, &#39;smith&#39;, &#39;spikedistance&#39;, &#39;template&#39;, &#39;ternary&#39;, &#39;title&#39;, &#39;transition&#39;, &#39;uirevision&#39;, &#39;uniformtext&#39;, &#39;updatemenus&#39;, &#39;width&#39;, &#39;xaxis&#39;, &#39;yaxis&#39;, &#39;barmode&#39;, &#39;bargap&#39;, &#39;mapType&#39;</code></pre>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-3f2033b030200789c9c0" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-3f2033b030200789c9c0">{"x":{"visdat":{"2b3f2fffc19d":["function () ","plotlyVisDat"],"2b3f40004309":["function () ","data"],"2b3f513124b2":["function () ","data"]},"cur_data":"2b3f513124b2","attrs":{"2b3f40004309":{"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"x":{},"y":{},"type":"box","name":"Calories","marker":{"color":"red"},"yaxis":"y1","inherit":true},"2b3f513124b2":{"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"x":{},"y":{},"type":"box","name":{},"color":{},"yaxis":"y2","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Nutritional Distribution of Top 10 Starbucks Menu Words","xaxis":{"domain":[0,1],"automargin":true,"title":"Top 10 Words in Menu Items","type":"category","categoryorder":"array","categoryarray":["Cake","Chocolate","Coffee","Egg","Iced","Protein","Sandwich","Starbucks","Tazo","Tea"]},"yaxis":{"domain":[0,1],"automargin":true,"title":"Calories","side":"left","showgrid":false},"yaxis2":{"title":"Other Nutrients (g)","overlaying":"y","side":"right","showgrid":false},"boxmode":"group","hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"fillcolor":"rgba(31,119,180,0.5)","x":["Chocolate","Chocolate","Chocolate","Chocolate","Chocolate","Chocolate","Coffee","Chocolate","Chocolate","Chocolate","Iced","Cake","Coffee","Cake","Sandwich","Sandwich","Sandwich","Protein","Sandwich","Sandwich","Sandwich","Sandwich","Sandwich","Sandwich","Protein","Protein","Protein","Protein","Protein","Protein","Cake","Chocolate","Chocolate","Cake","Egg","Sandwich","Egg","Egg","Egg","Egg","Egg","Egg","Egg","Egg","Egg","Protein","Sandwich","Egg","Protein","Sandwich","Chocolate","Iced","Iced","Starbucks","Coffee","Iced","Iced","Iced","Starbucks","Starbucks","Starbucks","Starbucks","Tazo","Tazo","Iced","Starbucks","Tazo","Tazo","Tazo","Iced","Iced","Tazo","Starbucks","Tea","Iced","Starbucks","Starbucks","Coffee","Tazo","Tazo","Tazo","Tazo","Iced","Iced","Iced","Iced","Iced","Iced","Tazo","Tazo","Tazo","Tazo","Tazo","Iced","Tazo","Tazo","Tazo","Tazo","Tazo","Coffee","Tazo","Tazo","Tazo","Tazo","Tazo","Tazo","Iced","Starbucks","Iced","Starbucks","Iced","Iced","Iced","Coffee","Iced","Chocolate","Chocolate","Coffee","Chocolate","Starbucks"],"y":[170,310,440,330,390,490,390,410,490,440,470,420,370,180,600,300,430,470,300,360,600,530,350,500,420,450,460,460,520,360,170,160,180,180,370,280,490,230,500,410,450,310,170,500,290,420,470,480,650,460,180,0,5,10,10,30,30,30,45,45,50,60,60,60,60,60,60,60,70,70,70,70,80,80,90,90,90,110,120,120,120,120,130,130,130,130,130,140,140,140,140,140,140,140,140,140,140,140,140,140,150,150,150,150,150,150,190,200,200,210,230,250,260,280,300,320,320,350,360,430],"type":"box","name":"Calories","marker":{"color":"red","line":{"color":"rgba(31,119,180,1)"}},"yaxis":"y","line":{"color":"rgba(31,119,180,1)"},"xaxis":"x","frame":null},{"fillcolor":"rgba(102,194,165,0.5)","x":["Chocolate","Chocolate","Chocolate","Chocolate","Chocolate","Chocolate","Coffee","Chocolate","Chocolate","Chocolate","Iced","Cake","Coffee","Cake","Sandwich","Sandwich","Sandwich","Protein","Sandwich","Sandwich","Sandwich","Sandwich","Sandwich","Sandwich","Protein","Protein","Protein","Protein","Protein","Protein","Cake","Chocolate","Chocolate","Cake","Egg","Sandwich","Egg","Egg","Egg","Egg","Egg","Egg","Egg","Egg","Egg","Protein","Sandwich","Egg","Protein","Sandwich","Chocolate","Iced","Iced","Starbucks","Coffee","Iced","Iced","Iced","Starbucks","Starbucks","Starbucks","Starbucks","Tazo","Tazo","Iced","Starbucks","Tazo","Tazo","Tazo","Iced","Iced","Tazo","Starbucks","Tea","Iced","Starbucks","Starbucks","Coffee","Tazo","Tazo","Tazo","Tazo","Iced","Iced","Iced","Iced","Iced","Iced","Tazo","Tazo","Tazo","Tazo","Tazo","Iced","Tazo","Tazo","Tazo","Tazo","Tazo","Coffee","Tazo","Tazo","Tazo","Tazo","Tazo","Tazo","Iced","Starbucks","Iced","Starbucks","Iced","Iced","Iced","Coffee","Iced","Chocolate","Chocolate","Coffee","Chocolate","Starbucks"],"y":[30,42,60,38,43,64,57,46,55,54,68,61,67,23,80,34,34,29,43,52,47,44,31,46,49,34,45,40,53,42,23,23,23,24,32,18,40,28,41,43,42,9,13,35,33,42,35,42,80,31,12,0,0,2,0,8,8,8,11,5,11,14,15,15,15,13,15,15,17,17,17,17,18,19,24,27,27,24,31,31,31,31,21,21,21,21,13,23,35,35,35,35,35,23,35,35,35,35,35,28,38,37,38,38,37,38,30,34,34,33,36,37,34,60,47,47,53,64,53,45],"type":"box","name":"Carb. (g)","yaxis":"y2","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"line":{"color":"rgba(102,194,165,1)"},"xaxis":"x","frame":null},{"fillcolor":"rgba(252,141,98,0.5)","x":["Chocolate","Chocolate","Chocolate","Chocolate","Chocolate","Chocolate","Coffee","Chocolate","Chocolate","Chocolate","Iced","Cake","Coffee","Cake","Sandwich","Sandwich","Sandwich","Protein","Sandwich","Sandwich","Sandwich","Sandwich","Sandwich","Sandwich","Protein","Protein","Protein","Protein","Protein","Protein","Cake","Chocolate","Chocolate","Cake","Egg","Sandwich","Egg","Egg","Egg","Egg","Egg","Egg","Egg","Egg","Egg","Protein","Sandwich","Egg","Protein","Sandwich","Chocolate","Iced","Iced","Starbucks","Coffee","Iced","Iced","Iced","Starbucks","Starbucks","Starbucks","Starbucks","Tazo","Tazo","Iced","Starbucks","Tazo","Tazo","Tazo","Iced","Iced","Tazo","Starbucks","Tea","Iced","Starbucks","Starbucks","Coffee","Tazo","Tazo","Tazo","Tazo","Iced","Iced","Iced","Iced","Iced","Iced","Tazo","Tazo","Tazo","Tazo","Tazo","Iced","Tazo","Tazo","Tazo","Tazo","Tazo","Coffee","Tazo","Tazo","Tazo","Tazo","Tazo","Tazo","Iced","Starbucks","Iced","Starbucks","Iced","Iced","Iced","Coffee","Iced","Chocolate","Chocolate","Coffee","Chocolate","Starbucks"],"y":[5,15,21,18,22,24,16,24,28,23,20,17,9,9,25,14,23,29,8,7,32,29,18,28,16,27,22,24,26,12,9,8,9,9,19,13,27,6,28,18,23,22,7,30,10,17,25,27,29,21,14,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2.5,2.5,2.5,2.5,4.5,2.5,0,0,0,0,0,2.5,0,0,0,0,0,0.5,0,0,0,0,0,0,4,2.5,4,2.5,6,7,9,2.5,8,9,5,4.5,11,26],"type":"box","name":"Fat (g)","yaxis":"y2","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"line":{"color":"rgba(252,141,98,1)"},"xaxis":"x","frame":null},{"fillcolor":"rgba(141,160,203,0.5)","x":["Chocolate","Chocolate","Chocolate","Chocolate","Chocolate","Chocolate","Coffee","Chocolate","Chocolate","Chocolate","Iced","Cake","Coffee","Cake","Sandwich","Sandwich","Sandwich","Protein","Sandwich","Sandwich","Sandwich","Sandwich","Sandwich","Sandwich","Protein","Protein","Protein","Protein","Protein","Protein","Cake","Chocolate","Chocolate","Cake","Egg","Sandwich","Egg","Egg","Egg","Egg","Egg","Egg","Egg","Egg","Egg","Protein","Sandwich","Egg","Protein","Sandwich","Chocolate","Iced","Iced","Starbucks","Coffee","Iced","Iced","Iced","Starbucks","Starbucks","Starbucks","Starbucks","Tazo","Tazo","Iced","Starbucks","Tazo","Tazo","Tazo","Iced","Iced","Tazo","Starbucks","Tea","Iced","Starbucks","Starbucks","Coffee","Tazo","Tazo","Tazo","Tazo","Iced","Iced","Iced","Iced","Iced","Iced","Tazo","Tazo","Tazo","Tazo","Tazo","Iced","Tazo","Tazo","Tazo","Tazo","Tazo","Coffee","Tazo","Tazo","Tazo","Tazo","Tazo","Tazo","Iced","Starbucks","Iced","Starbucks","Iced","Iced","Iced","Coffee","Iced","Chocolate","Chocolate","Coffee","Chocolate","Starbucks"],"y":[2,2,2,1,2,2,1,3,3,3,1,1,2,0,10,2,3,4,2,3,6,2,1,4,5,4,4,5,5,5,0,1,0,0,1,6,1,2,1,2,1,0,1,3,6,9,3,7,21,2,3,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,2,0,2,4,0,0,2,0,4,8,0,0,5],"type":"box","name":"Fiber (g)","yaxis":"y2","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"line":{"color":"rgba(141,160,203,1)"},"xaxis":"x","frame":null},{"fillcolor":"rgba(231,138,195,0.5)","x":["Chocolate","Chocolate","Chocolate","Chocolate","Chocolate","Chocolate","Coffee","Chocolate","Chocolate","Chocolate","Iced","Cake","Coffee","Cake","Sandwich","Sandwich","Sandwich","Protein","Sandwich","Sandwich","Sandwich","Sandwich","Sandwich","Sandwich","Protein","Protein","Protein","Protein","Protein","Protein","Cake","Chocolate","Chocolate","Cake","Egg","Sandwich","Egg","Egg","Egg","Egg","Egg","Egg","Egg","Egg","Egg","Protein","Sandwich","Egg","Protein","Sandwich","Chocolate","Iced","Iced","Starbucks","Coffee","Iced","Iced","Iced","Starbucks","Starbucks","Starbucks","Starbucks","Tazo","Tazo","Iced","Starbucks","Tazo","Tazo","Tazo","Iced","Iced","Tazo","Starbucks","Tea","Iced","Starbucks","Starbucks","Coffee","Tazo","Tazo","Tazo","Tazo","Iced","Iced","Iced","Iced","Iced","Iced","Tazo","Tazo","Tazo","Tazo","Tazo","Iced","Tazo","Tazo","Tazo","Tazo","Tazo","Coffee","Tazo","Tazo","Tazo","Tazo","Tazo","Tazo","Iced","Starbucks","Iced","Starbucks","Iced","Iced","Iced","Coffee","Iced","Chocolate","Chocolate","Coffee","Chocolate","Starbucks"],"y":[2,4,7,6,7,6,5,6,7,5,6,6,5,2,19,11,21,21,19,22,32,23,16,18,22,20,20,23,20,24,1,2,2,1,18,18,21,16,15,21,24,19,13,26,19,27,21,16,23,29,4,0,0,1,1,0,0,0,0,3,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,5,5,5,5,8,5,0,0,0,0,0,5,0,0,0,0,0,4,0,0,0,0,0,0,7,20,7,20,9,10,11,4,10,14,20,15,14,12],"type":"box","name":"Protein (g)","yaxis":"y2","marker":{"color":"rgba(231,138,195,1)","line":{"color":"rgba(231,138,195,1)"}},"line":{"color":"rgba(231,138,195,1)"},"xaxis":"x","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<ul>
+<li><ol start="6" style="list-style-type: decimal">
+<li>Answer: Sandwich has the most calories and the most protein.</li>
+</ol></li>
+</ul>
+</div>
+<div id="d-scatterplot" class="section level3">
+<h3>7. 3D Scatterplot</h3>
+<ul>
+<li>Create a 3D scatterplot between Calories, Carbs, and Protein for the
+items containing the top 10 words</li>
+<li>Do you see any patterns (clusters or trends)?</li>
+</ul>
+<pre class="r"><code># Create a 3D scatterplot
+plot_ly(data = sb_nutr_filtered, 
+        x = ~`Carb. (g)`, 
+        y = ~Calories, 
+        z = ~`Protein (g)`, 
+        color = ~matching_word,  # Color by top word
+        type = &quot;scatter3d&quot;, 
+        mode = &quot;markers&quot;, 
+        marker = list(size = 5, opacity = 0.6)) %&gt;%
+  layout(title = &quot;3D Scatterplot of Calories, Carbs, and Protein for Top 10 Words&quot;,
+         scene = list(
+           xaxis = list(title = &quot;Carbohydrates (g)&quot;),
+           yaxis = list(title = &quot;Calories&quot;),
+           zaxis = list(title = &quot;Protein (g)&quot;)
+         ))</code></pre>
+<pre><code>## Warning in RColorBrewer::brewer.pal(N, &quot;Set2&quot;): n too large, allowed maximum for palette Set2 is 8
+## Returning the palette you asked for with that many colors
+## Warning in RColorBrewer::brewer.pal(N, &quot;Set2&quot;): n too large, allowed maximum for palette Set2 is 8
+## Returning the palette you asked for with that many colors</code></pre>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-9a48074d577391ecbf97" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-9a48074d577391ecbf97">{"x":{"visdat":{"2b3ffe7104e":["function () ","plotlyVisDat"]},"cur_data":"2b3ffe7104e","attrs":{"2b3ffe7104e":{"x":{},"y":{},"z":{},"mode":"markers","marker":{"size":5,"opacity":0.59999999999999998},"color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"3D Scatterplot of Calories, Carbs, and Protein for Top 10 Words","scene":{"xaxis":{"title":"Carbohydrates (g)"},"yaxis":{"title":"Calories"},"zaxis":{"title":"Protein (g)"}},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[61,23,23,24],"y":[420,180,170,180],"z":[6,2,1,1],"mode":"markers","marker":{"color":"rgba(102,194,165,1)","size":5,"opacity":0.59999999999999998,"line":{"color":"rgba(102,194,165,1)"}},"type":"scatter3d","name":"Cake","textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"frame":null},{"x":[30,42,60,38,43,64,46,55,54,23,23,12,47,53,53],"y":[170,310,440,330,390,490,410,490,440,160,180,180,320,320,360],"z":[2,4,7,6,7,6,6,7,5,2,2,4,14,20,14],"mode":"markers","marker":{"color":"rgba(228,156,113,1)","size":5,"opacity":0.59999999999999998,"line":{"color":"rgba(228,156,113,1)"}},"type":"scatter3d","name":"Chocolate","textfont":{"color":"rgba(228,156,113,1)"},"error_y":{"color":"rgba(228,156,113,1)"},"error_x":{"color":"rgba(228,156,113,1)"},"line":{"color":"rgba(228,156,113,1)"},"frame":null},{"x":[57,67,0,24,28,60,64],"y":[390,370,10,110,140,280,350],"z":[5,5,1,3,4,4,15],"mode":"markers","marker":{"color":"rgba(201,152,157,1)","size":5,"opacity":0.59999999999999998,"line":{"color":"rgba(201,152,157,1)"}},"type":"scatter3d","name":"Coffee","textfont":{"color":"rgba(201,152,157,1)"},"error_y":{"color":"rgba(201,152,157,1)"},"error_x":{"color":"rgba(201,152,157,1)"},"line":{"color":"rgba(201,152,157,1)"},"frame":null},{"x":[32,40,28,41,43,42,9,13,35,33,42],"y":[370,490,230,500,410,450,310,170,500,290,480],"z":[18,21,16,15,21,24,19,13,26,19,16],"mode":"markers","marker":{"color":"rgba(175,154,200,1)","size":5,"opacity":0.59999999999999998,"line":{"color":"rgba(175,154,200,1)"}},"type":"scatter3d","name":"Egg","textfont":{"color":"rgba(175,154,200,1)"},"error_y":{"color":"rgba(175,154,200,1)"},"error_x":{"color":"rgba(175,154,200,1)"},"line":{"color":"rgba(175,154,200,1)"},"frame":null},{"x":[68,0,0,8,8,8,15,17,17,24,21,21,21,21,13,23,23,30,34,36,37,34,47],"y":[470,0,5,30,30,30,60,70,70,90,130,130,130,130,130,140,140,190,200,230,250,260,300],"z":[6,0,0,0,0,0,0,0,0,0,5,5,5,5,8,5,5,7,7,9,10,11,10],"mode":"markers","marker":{"color":"rgba(226,148,184,1)","size":5,"opacity":0.59999999999999998,"line":{"color":"rgba(226,148,184,1)"}},"type":"scatter3d","name":"Iced","textfont":{"color":"rgba(226,148,184,1)"},"error_y":{"color":"rgba(226,148,184,1)"},"error_x":{"color":"rgba(226,148,184,1)"},"line":{"color":"rgba(226,148,184,1)"},"frame":null},{"x":[29,49,34,45,40,53,42,42,80],"y":[470,420,450,460,460,520,360,420,650],"z":[21,22,20,20,23,20,24,27,23],"mode":"markers","marker":{"color":"rgba(176,208,99,1)","size":5,"opacity":0.59999999999999998,"line":{"color":"rgba(176,208,99,1)"}},"type":"scatter3d","name":"Protein","textfont":{"color":"rgba(176,208,99,1)"},"error_y":{"color":"rgba(176,208,99,1)"},"error_x":{"color":"rgba(176,208,99,1)"},"line":{"color":"rgba(176,208,99,1)"},"frame":null},{"x":[80,34,34,43,52,47,44,31,46,18,35,31],"y":[600,300,430,300,360,600,530,350,500,280,470,460],"z":[19,11,21,19,22,32,23,16,18,18,21,29],"mode":"markers","marker":{"color":"rgba(227,217,62,1)","size":5,"opacity":0.59999999999999998,"line":{"color":"rgba(227,217,62,1)"}},"type":"scatter3d","name":"Sandwich","textfont":{"color":"rgba(227,217,62,1)"},"error_y":{"color":"rgba(227,217,62,1)"},"error_x":{"color":"rgba(227,217,62,1)"},"line":{"color":"rgba(227,217,62,1)"},"frame":null},{"x":[2,11,5,11,14,13,18,27,27,34,33,45],"y":[10,45,45,50,60,60,80,90,90,200,210,430],"z":[1,0,3,1,0,1,0,0,0,20,20,12],"mode":"markers","marker":{"color":"rgba(245,207,100,1)","size":5,"opacity":0.59999999999999998,"line":{"color":"rgba(245,207,100,1)"}},"type":"scatter3d","name":"Starbucks","textfont":{"color":"rgba(245,207,100,1)"},"error_y":{"color":"rgba(245,207,100,1)"},"error_x":{"color":"rgba(245,207,100,1)"},"line":{"color":"rgba(245,207,100,1)"},"frame":null},{"x":[15,15,15,15,17,17,31,31,31,31,35,35,35,35,35,35,35,35,35,35,38,37,38,38,37,38],"y":[60,60,60,60,70,70,120,120,120,120,140,140,140,140,140,140,140,140,140,140,150,150,150,150,150,150],"z":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"mode":"markers","marker":{"color":"rgba(219,192,155,1)","size":5,"opacity":0.59999999999999998,"line":{"color":"rgba(219,192,155,1)"}},"type":"scatter3d","name":"Tazo","textfont":{"color":"rgba(219,192,155,1)"},"error_y":{"color":"rgba(219,192,155,1)"},"error_x":{"color":"rgba(219,192,155,1)"},"line":{"color":"rgba(219,192,155,1)"},"frame":null},{"x":[19],"y":[80],"z":[0],"mode":"markers","marker":{"color":"rgba(179,179,179,1)","size":5,"opacity":0.59999999999999998,"line":{"color":"rgba(179,179,179,1)"}},"type":"scatter3d","name":"Tea","textfont":{"color":"rgba(179,179,179,1)"},"error_y":{"color":"rgba(179,179,179,1)"},"error_x":{"color":"rgba(179,179,179,1)"},"line":{"color":"rgba(179,179,179,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<ul>
+<li><ol start="7" style="list-style-type: decimal">
+<li>Answer: There is a clear positive correlation between calories,
+protein, and carbs, and a small cluster of items with 0 proteins having
+a positive correlation ebtween calories and carbs.</li>
+</ol></li>
+</ul>
+</div>
+<div id="plot_ly-map" class="section level3">
+<h3>8. <code>plot_ly</code> Map</h3>
+<ul>
+<li>Create a map to visualize the number of stores per state, and
+another for the population by state. Add custom hover text. Use subplot
+to put the maps side by side.</li>
+<li>Describe the differences if any.</li>
+</ul>
+<pre class="r"><code># Create hover text
+# Create hover text
+sb_locs_state$hover &lt;- with(sb_locs_state, paste(&quot;Number of Starbucks: &quot;, store_count, &#39;&lt;br&gt;&#39;, &quot;State: &quot;, state, &#39;&lt;br&gt;&#39;, &quot;Population: &quot;, population))
+
+
+# Set up mapping details
+set_map_details &lt;- list(
+  scope = &#39;usa&#39;,
+  projection = list(type = &#39;albers usa&#39;),
+  showlakes = TRUE,
+  lakecolor = toRGB(&#39;steelblue&#39;)
+)
+
+# Make sure both maps are on the same color scale
+shadeLimit &lt;- 125
+
+
+# Create the map
+
+# Create a map for the number of stores
+map1 &lt;- plot_geo(sb_locs_state, locationmode = &#39;USA-states&#39;) %&gt;%
+  add_trace(
+    z = ~store_count,
+    locations = ~`State/Province`,
+    color = ~store_count,
+    colors = &#39;Reds&#39;,
+    hoverinfo = &#39;text&#39;,
+    text = ~hover
+  ) %&gt;%
+  layout(
+    title = &quot;Number of Starbucks Stores per State&quot;,
+    geo = set_map_details
+  )
+# Create a map for the population
+map2 &lt;- plot_geo(sb_locs_state, locationmode = &#39;USA-states&#39;) %&gt;%
+  add_trace(
+    z = ~population,
+    locations = ~`State/Province`,
+    color = ~population,
+    colors = &#39;Blues&#39;,
+    hoverinfo = &#39;text&#39;,
+    text = ~hover
+  ) %&gt;%
+  layout(
+    title = &quot;Population per State&quot;,
+    geo = set_map_details
+  )
+# Place maps side by side
+subplot(map1, map2, nrows = 1, shareX = TRUE, shareY = TRUE) %&gt;%
+  layout(
+    title = &quot;Starbucks Stores and Population by State&quot;
+  )</code></pre>
+<pre><code>## Warning: Ignoring 4 observations</code></pre>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-810489a6ff607650b4f7" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-810489a6ff607650b4f7">{"x":{"data":[{"colorbar":{"title":"store_count","ticklen":2,"len":0.33333333333333331,"lenmode":"fraction","y":1,"yanchor":"top"},"colorscale":[["0","rgba(255,245,240,1)"],["0.0416666666666667","rgba(255,238,230,1)"],["0.0833333333333333","rgba(255,231,220,1)"],["0.125","rgba(254,224,210,1)"],["0.166666666666667","rgba(254,212,193,1)"],["0.208333333333333","rgba(253,199,177,1)"],["0.25","rgba(252,187,161,1)"],["0.291666666666667","rgba(253,174,145,1)"],["0.333333333333333","rgba(253,160,129,1)"],["0.375","rgba(252,146,114,1)"],["0.416666666666667","rgba(252,133,101,1)"],["0.458333333333333","rgba(252,120,87,1)"],["0.5","rgba(251,106,74,1)"],["0.541666666666667","rgba(247,92,64,1)"],["0.583333333333333","rgba(243,77,54,1)"],["0.625","rgba(239,59,44,1)"],["0.666666666666667","rgba(227,49,39,1)"],["0.708333333333333","rgba(215,37,34,1)"],["0.75","rgba(203,24,29,1)"],["0.791666666666667","rgba(190,21,26,1)"],["0.833333333333333","rgba(178,18,24,1)"],["0.875","rgba(165,15,21,1)"],["0.916666666666667","rgba(144,9,19,1)"],["0.958333333333333","rgba(123,3,16,1)"],["1","rgba(103,0,13,1)"]],"showscale":true,"locationmode":"USA-states","z":[49,85,55,488,2821,481,123,91,25,694,326,99,89,67,575,221,94,116,84,273,257,30,283,184,188,32,36,338,13,58,29,261,76,253,645,378,79,359,357,27,131,25,180,1042,101,432,8,757,145,25,23],"locations":["AK","AL","AR","AZ","CA","CO","CT","DC","DE","FL","GA","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VA","VT","WA","WI","WV","WY"],"hoverinfo":["text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text"],"text":["Number of Starbucks:  49 <br> State:  Alaska <br> Population:  710231","Number of Starbucks:  85 <br> State:  Alabama <br> Population:  4779736","Number of Starbucks:  55 <br> State:  Arkansas <br> Population:  2915918","Number of Starbucks:  488 <br> State:  Arizona <br> Population:  6392017","Number of Starbucks:  2821 <br> State:  California <br> Population:  37253956","Number of Starbucks:  481 <br> State:  Colorado <br> Population:  5029196","Number of Starbucks:  123 <br> State:  Connecticut <br> Population:  3574097","Number of Starbucks:  91 <br> State:  District of Columbia <br> Population:  601723","Number of Starbucks:  25 <br> State:  Delaware <br> Population:  897934","Number of Starbucks:  694 <br> State:  Florida <br> Population:  18801310","Number of Starbucks:  326 <br> State:  Georgia <br> Population:  9687653","Number of Starbucks:  99 <br> State:  Hawaii <br> Population:  1360301","Number of Starbucks:  89 <br> State:  Iowa <br> Population:  3046355","Number of Starbucks:  67 <br> State:  Idaho <br> Population:  1567582","Number of Starbucks:  575 <br> State:  Illinois <br> Population:  12830632","Number of Starbucks:  221 <br> State:  Indiana <br> Population:  6483802","Number of Starbucks:  94 <br> State:  Kansas <br> Population:  2853118","Number of Starbucks:  116 <br> State:  Kentucky <br> Population:  4339367","Number of Starbucks:  84 <br> State:  Louisiana <br> Population:  4533372","Number of Starbucks:  273 <br> State:  Massachusetts <br> Population:  6547629","Number of Starbucks:  257 <br> State:  Maryland <br> Population:  5773552","Number of Starbucks:  30 <br> State:  Maine <br> Population:  1328361","Number of Starbucks:  283 <br> State:  Michigan <br> Population:  9883640","Number of Starbucks:  184 <br> State:  Minnesota <br> Population:  5303925","Number of Starbucks:  188 <br> State:  Missouri <br> Population:  5988927","Number of Starbucks:  32 <br> State:  Mississippi <br> Population:  2967297","Number of Starbucks:  36 <br> State:  Montana <br> Population:  989415","Number of Starbucks:  338 <br> State:  North Carolina <br> Population:  9535483","Number of Starbucks:  13 <br> State:  North Dakota <br> Population:  672591","Number of Starbucks:  58 <br> State:  Nebraska <br> Population:  1826341","Number of Starbucks:  29 <br> State:  New Hampshire <br> Population:  1316470","Number of Starbucks:  261 <br> State:  New Jersey <br> Population:  8791894","Number of Starbucks:  76 <br> State:  New Mexico <br> Population:  2059179","Number of Starbucks:  253 <br> State:  Nevada <br> Population:  2700551","Number of Starbucks:  645 <br> State:  New York <br> Population:  19378102","Number of Starbucks:  378 <br> State:  Ohio <br> Population:  11536504","Number of Starbucks:  79 <br> State:  Oklahoma <br> Population:  3751351","Number of Starbucks:  359 <br> State:  Oregon <br> Population:  3831074","Number of Starbucks:  357 <br> State:  Pennsylvania <br> Population:  12702379","Number of Starbucks:  27 <br> State:  Rhode Island <br> Population:  1052567","Number of Starbucks:  131 <br> State:  South Carolina <br> Population:  4625364","Number of Starbucks:  25 <br> State:  South Dakota <br> Population:  814180","Number of Starbucks:  180 <br> State:  Tennessee <br> Population:  6346105","Number of Starbucks:  1042 <br> State:  Texas <br> Population:  25145561","Number of Starbucks:  101 <br> State:  Utah <br> Population:  2763885","Number of Starbucks:  432 <br> State:  Virginia <br> Population:  8001024","Number of Starbucks:  8 <br> State:  Vermont <br> Population:  625741","Number of Starbucks:  757 <br> State:  Washington <br> Population:  6724540","Number of Starbucks:  145 <br> State:  Wisconsin <br> Population:  5686986","Number of Starbucks:  25 <br> State:  West Virginia <br> Population:  1852994","Number of Starbucks:  23 <br> State:  Wyoming <br> Population:  563626"],"type":"choropleth","marker":{"line":{"colorbar":{"title":"","ticklen":2},"cmin":8,"cmax":2821,"colorscale":[["0","rgba(255,245,240,1)"],["0.0416666666666667","rgba(255,238,230,1)"],["0.0833333333333333","rgba(255,231,220,1)"],["0.125","rgba(254,224,210,1)"],["0.166666666666667","rgba(254,212,193,1)"],["0.208333333333333","rgba(253,199,177,1)"],["0.25","rgba(252,187,161,1)"],["0.291666666666667","rgba(253,174,145,1)"],["0.333333333333333","rgba(253,160,129,1)"],["0.375","rgba(252,146,114,1)"],["0.416666666666667","rgba(252,133,101,1)"],["0.458333333333333","rgba(252,120,87,1)"],["0.5","rgba(251,106,74,1)"],["0.541666666666667","rgba(247,92,64,1)"],["0.583333333333333","rgba(243,77,54,1)"],["0.625","rgba(239,59,44,1)"],["0.666666666666667","rgba(227,49,39,1)"],["0.708333333333333","rgba(215,37,34,1)"],["0.75","rgba(203,24,29,1)"],["0.791666666666667","rgba(190,21,26,1)"],["0.833333333333333","rgba(178,18,24,1)"],["0.875","rgba(165,15,21,1)"],["0.916666666666667","rgba(144,9,19,1)"],["0.958333333333333","rgba(123,3,16,1)"],["1","rgba(103,0,13,1)"]],"showscale":false,"color":[49,85,55,488,2821,481,123,91,25,694,326,99,89,67,575,221,94,116,84,273,257,30,283,184,188,32,36,338,13,58,29,261,76,253,645,378,79,359,357,27,131,25,180,1042,101,432,8,757,145,25,23]}},"geo":"geo","frame":null},{"colorbar":{"title":"population","ticklen":2,"len":0.33333333333333331,"lenmode":"fraction","y":0.66666666666666674,"yanchor":"top"},"colorscale":[["0","rgba(247,251,255,1)"],["0.0416666666666667","rgba(239,246,252,1)"],["0.0833333333333333","rgba(230,240,250,1)"],["0.125","rgba(222,235,247,1)"],["0.166666666666667","rgba(214,230,244,1)"],["0.208333333333333","rgba(206,224,242,1)"],["0.25","rgba(198,219,239,1)"],["0.291666666666667","rgba(185,213,234,1)"],["0.333333333333333","rgba(172,208,230,1)"],["0.375","rgba(158,202,225,1)"],["0.416666666666667","rgba(142,193,221,1)"],["0.458333333333333","rgba(125,183,218,1)"],["0.5","rgba(107,174,214,1)"],["0.541666666666667","rgba(94,165,209,1)"],["0.583333333333333","rgba(81,155,203,1)"],["0.625","rgba(66,146,198,1)"],["0.666666666666667","rgba(57,135,192,1)"],["0.708333333333333","rgba(46,124,187,1)"],["0.75","rgba(33,113,181,1)"],["0.791666666666667","rgba(27,102,173,1)"],["0.833333333333333","rgba(19,91,164,1)"],["0.875","rgba(8,81,156,1)"],["0.916666666666667","rgba(9,70,139,1)"],["0.958333333333333","rgba(9,59,123,1)"],["1","rgba(8,48,107,1)"]],"showscale":true,"locationmode":"USA-states","z":[710231,4779736,2915918,6392017,37253956,5029196,3574097,601723,897934,18801310,9687653,1360301,3046355,1567582,12830632,6483802,2853118,4339367,4533372,6547629,5773552,1328361,9883640,5303925,5988927,2967297,989415,9535483,672591,1826341,1316470,8791894,2059179,2700551,19378102,11536504,3751351,3831074,12702379,1052567,4625364,814180,6346105,25145561,2763885,8001024,625741,6724540,5686986,1852994,563626,3194000,106977,165768,56882],"locations":["AK","AL","AR","AZ","CA","CO","CT","DC","DE","FL","GA","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VA","VT","WA","WI","WV","WY",null,null,null,null],"hoverinfo":["text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text","text"],"text":["Number of Starbucks:  49 <br> State:  Alaska <br> Population:  710231","Number of Starbucks:  85 <br> State:  Alabama <br> Population:  4779736","Number of Starbucks:  55 <br> State:  Arkansas <br> Population:  2915918","Number of Starbucks:  488 <br> State:  Arizona <br> Population:  6392017","Number of Starbucks:  2821 <br> State:  California <br> Population:  37253956","Number of Starbucks:  481 <br> State:  Colorado <br> Population:  5029196","Number of Starbucks:  123 <br> State:  Connecticut <br> Population:  3574097","Number of Starbucks:  91 <br> State:  District of Columbia <br> Population:  601723","Number of Starbucks:  25 <br> State:  Delaware <br> Population:  897934","Number of Starbucks:  694 <br> State:  Florida <br> Population:  18801310","Number of Starbucks:  326 <br> State:  Georgia <br> Population:  9687653","Number of Starbucks:  99 <br> State:  Hawaii <br> Population:  1360301","Number of Starbucks:  89 <br> State:  Iowa <br> Population:  3046355","Number of Starbucks:  67 <br> State:  Idaho <br> Population:  1567582","Number of Starbucks:  575 <br> State:  Illinois <br> Population:  12830632","Number of Starbucks:  221 <br> State:  Indiana <br> Population:  6483802","Number of Starbucks:  94 <br> State:  Kansas <br> Population:  2853118","Number of Starbucks:  116 <br> State:  Kentucky <br> Population:  4339367","Number of Starbucks:  84 <br> State:  Louisiana <br> Population:  4533372","Number of Starbucks:  273 <br> State:  Massachusetts <br> Population:  6547629","Number of Starbucks:  257 <br> State:  Maryland <br> Population:  5773552","Number of Starbucks:  30 <br> State:  Maine <br> Population:  1328361","Number of Starbucks:  283 <br> State:  Michigan <br> Population:  9883640","Number of Starbucks:  184 <br> State:  Minnesota <br> Population:  5303925","Number of Starbucks:  188 <br> State:  Missouri <br> Population:  5988927","Number of Starbucks:  32 <br> State:  Mississippi <br> Population:  2967297","Number of Starbucks:  36 <br> State:  Montana <br> Population:  989415","Number of Starbucks:  338 <br> State:  North Carolina <br> Population:  9535483","Number of Starbucks:  13 <br> State:  North Dakota <br> Population:  672591","Number of Starbucks:  58 <br> State:  Nebraska <br> Population:  1826341","Number of Starbucks:  29 <br> State:  New Hampshire <br> Population:  1316470","Number of Starbucks:  261 <br> State:  New Jersey <br> Population:  8791894","Number of Starbucks:  76 <br> State:  New Mexico <br> Population:  2059179","Number of Starbucks:  253 <br> State:  Nevada <br> Population:  2700551","Number of Starbucks:  645 <br> State:  New York <br> Population:  19378102","Number of Starbucks:  378 <br> State:  Ohio <br> Population:  11536504","Number of Starbucks:  79 <br> State:  Oklahoma <br> Population:  3751351","Number of Starbucks:  359 <br> State:  Oregon <br> Population:  3831074","Number of Starbucks:  357 <br> State:  Pennsylvania <br> Population:  12702379","Number of Starbucks:  27 <br> State:  Rhode Island <br> Population:  1052567","Number of Starbucks:  131 <br> State:  South Carolina <br> Population:  4625364","Number of Starbucks:  25 <br> State:  South Dakota <br> Population:  814180","Number of Starbucks:  180 <br> State:  Tennessee <br> Population:  6346105","Number of Starbucks:  1042 <br> State:  Texas <br> Population:  25145561","Number of Starbucks:  101 <br> State:  Utah <br> Population:  2763885","Number of Starbucks:  432 <br> State:  Virginia <br> Population:  8001024","Number of Starbucks:  8 <br> State:  Vermont <br> Population:  625741","Number of Starbucks:  757 <br> State:  Washington <br> Population:  6724540","Number of Starbucks:  145 <br> State:  Wisconsin <br> Population:  5686986","Number of Starbucks:  25 <br> State:  West Virginia <br> Population:  1852994","Number of Starbucks:  23 <br> State:  Wyoming <br> Population:  563626","Number of Starbucks:  NA <br> State:  Puerto Rico <br> Population:  3194000","Number of Starbucks:  NA <br> State:  Virgin Islands <br> Population:  106977","Number of Starbucks:  NA <br> State:  Guam <br> Population:  165768","Number of Starbucks:  NA <br> State:  Northern Mariana Islands <br> Population:  56882"],"type":"choropleth","marker":{"line":{"colorbar":{"title":"","ticklen":2},"cmin":56882,"cmax":37253956,"colorscale":[["0","rgba(247,251,255,1)"],["0.0416666666666667","rgba(239,246,252,1)"],["0.0833333333333333","rgba(230,240,250,1)"],["0.125","rgba(222,235,247,1)"],["0.166666666666667","rgba(214,230,244,1)"],["0.208333333333333","rgba(206,224,242,1)"],["0.25","rgba(198,219,239,1)"],["0.291666666666667","rgba(185,213,234,1)"],["0.333333333333333","rgba(172,208,230,1)"],["0.375","rgba(158,202,225,1)"],["0.416666666666667","rgba(142,193,221,1)"],["0.458333333333333","rgba(125,183,218,1)"],["0.5","rgba(107,174,214,1)"],["0.541666666666667","rgba(94,165,209,1)"],["0.583333333333333","rgba(81,155,203,1)"],["0.625","rgba(66,146,198,1)"],["0.666666666666667","rgba(57,135,192,1)"],["0.708333333333333","rgba(46,124,187,1)"],["0.75","rgba(33,113,181,1)"],["0.791666666666667","rgba(27,102,173,1)"],["0.833333333333333","rgba(19,91,164,1)"],["0.875","rgba(8,81,156,1)"],["0.916666666666667","rgba(9,70,139,1)"],["0.958333333333333","rgba(9,59,123,1)"],["1","rgba(8,48,107,1)"]],"showscale":false,"color":[710231,4779736,2915918,6392017,37253956,5029196,3574097,601723,897934,18801310,9687653,1360301,3046355,1567582,12830632,6483802,2853118,4339367,4533372,6547629,5773552,1328361,9883640,5303925,5988927,2967297,989415,9535483,672591,1826341,1316470,8791894,2059179,2700551,19378102,11536504,3751351,3831074,12702379,1052567,4625364,814180,6346105,25145561,2763885,8001024,625741,6724540,5686986,1852994,563626,3194000,106977,165768,56882]}},"geo":"geo2","frame":null}],"layout":{"geo":{"domain":{"x":[0,0.47999999999999998],"y":[0,1]},"scope":"usa","projection":{"type":"albers usa"},"showlakes":true,"lakecolor":"rgba(70,130,180,1)"},"geo2":{"domain":{"x":[0.52000000000000002,1],"y":[0,1]},"scope":"usa","projection":{"type":"albers usa"},"showlakes":true,"lakecolor":"rgba(70,130,180,1)"},"margin":{"b":40,"l":60,"t":25,"r":10},"mapType":"geo","title":"Starbucks Stores and Population by State","scene":{"zaxis":{"title":"population"}},"hovermode":"closest","showlegend":false,"legend":{"yanchor":"top","y":0.33333333333333337}},"attrs":{"2b3f2b1d866f":{"locationmode":"USA-states","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"z":{},"locations":{},"color":{},"colors":"Blues","hoverinfo":"text","text":{},"inherit":true}},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"subplot":true,"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<ul>
+<li><ol start="8" style="list-style-type: decimal">
+<li>Answer: The maps seem to follow the same pattern, with California
+having a large population as well as a large number of stores.</li>
+</ol></li>
+</ul>
+</div>
+</div>
+
+<p>Copyright &copy; 2025. Your Name Here.</p>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

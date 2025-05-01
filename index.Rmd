@@ -22,7 +22,7 @@ suppressPackageStartupMessages({
 })
 ```
 
-```{r echo = FALSE}
+```{r echo = FALSE, message = FALSE}
 source("process_starbucks_data.R")
 
 p1 <- plot_ly(data = sb_nutr, 

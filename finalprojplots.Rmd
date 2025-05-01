@@ -114,9 +114,12 @@ p3 <-  ggplotly(p_xgb)
 ```{r, echo=FALSE}
 p1
 ```
+Website Fig 1: Interactive plot of average temperature and number of crimes per month (Toronto, 2024). The relationship is magnified when the y-axis for number of crimes is scaled to fit the range of values. Both trends peak during the summer months, indicating an increase in crimes during warmer weather.
 ```{r, echo=FALSE}
 p2
 ```
+Website Fig 2: Variable importance for the Random Forest Model. The most important variables are humidity, visibility, and temperature. Note that this model only included weather-related factors, and other economic, social, or demographic factors may (and likely have) a bigger impact on crime rates overall.
 ```{r, echo=FALSE}
 p3
 ```
+Website Fig 3: Variable importance for the XGBoost Model. The most important variables are wind speed, temperature, and visibility. Wind speed is much more important in this model than the random forest model, while temperature and visibility are present in both models. Both models agree on snowfall being the least important variable, followed by precipitation.

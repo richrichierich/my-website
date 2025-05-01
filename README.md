@@ -1,1 +1,9 @@
-My JSC370 Final Project Website
+JSC370 Final Project - Richard Guo
+Weather and Crime in Toronto: Analyzing the Impact of Meteorological Conditions
+on Criminal Activity
+
+This study aims to understand the influence of weather on crime rates in Toronto
+using Random Forests and XGBoost Models. By combining two datasets; one with
+crime data and one with meteorological data, this study looks at what weather
+conditions looked like when crimes were and weren't committed. Read the full
+study [here](https://richrichierich.github.io/jsc370-final/finalprojplots.html).

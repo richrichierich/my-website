@@ -21,7 +21,8 @@ suppressPackageStartupMessages({
   library(htmlwidgets)
 })
 ```
-
+[Download the full report (PDF)](JSCFinal.pdf)
+For better reading experience, [Download the full report (HTML)](JSCFinal.html)
 ```{r, echo = FALSE}
 source("finalprojscript.R")
 library(plotly)

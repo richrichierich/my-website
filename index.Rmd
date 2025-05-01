@@ -1,18 +1,28 @@
 ---
 title: "JSC370 Final Project"
 author: "Richard Guo"
-output: 
-    html_document:
-        toc: TRUE
-        toc_float: TRUE
+output:
+  html_document:
+    toc: true
+    toc_float: true
 ---
 
 This is my JSC370 Final Project website.
 ```{r setup, echo=FALSE}
 knitr::opts_chunk$set(eval = TRUE, echo  = FALSE, warning = FALSE, include = TRUE)
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(plotly)
+  library(dplyr)
+  library(nlme)
+  library(mgcv)         
+  library(randomForest)
+  library(xgboost)
+  library(tidyverse)
+})
 ```
 
-```{r include = TRUE}
+```{r echo = FALSE}
 source("process_starbucks_data.R")
 
 p1 <- plot_ly(data = sb_nutr, 

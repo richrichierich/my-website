@@ -8,6 +8,18 @@ always_allow_html: true
 
 ```{r setup, echo=FALSE}
 knitr::opts_chunk$set(eval = TRUE, echo  = FALSE, warning = FALSE, include = TRUE)
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(plotly)
+  library(dplyr)
+  library(nlme)
+  library(mgcv)         
+  library(randomForest)
+  library(xgboost)
+  library(httr)
+  library(lubridate)
+  library(htmlwidgets)
+})
 ```
 
 ```{r, echo = FALSE}

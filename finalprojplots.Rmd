@@ -1,0 +1,109 @@
+---
+title: "JSC370 Final Project Plots"
+author: "Richard Guo"
+output:
+  html_document: default
+always_allow_html: true
+---
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(eval = TRUE, echo  = FALSE, warning = FALSE, include = TRUE)
+```
+
+```{r, echo = FALSE}
+source("finalprojscript.R")
+library(plotly)
+library(dplyr)
+
+final_table <- final_table %>%
+  mutate(month = factor(month, levels = month.name))  # Ensure months are in order
+
+
+  # Create interactive plot with dual y-axes
+p1 <-  plot_ly(final_table) %>%
+    add_lines(
+      x = ~month, y = ~num_crimes,
+      name = "Number of Crimes",
+      yaxis = "y1",
+      line = list(color = "blue")
+    ) %>%
+    add_lines(
+      x = ~month, y = ~avg_temp,
+      name = "Average Temperature (°C)",
+      yaxis = "y2",
+      line = list(color = "red")
+    ) %>%
+    layout(
+      title = "Monthly Average Temperature and Number of Crimes",
+      xaxis = list(title = "Month"),
+      yaxis = list(title = "Number of Crimes"),
+      yaxis2 = list(
+        title = "Average Temperature (°C)",
+        overlaying = "y",
+        side = "right"
+      ),
+      legend = list(x = 0.1, y = 1)
+    )
+
+# === Variable Importance Plots ===
+# RF
+
+var_labels <- c(
+  temperature = "Temperature",
+  humidity = "Humidity",
+  precipitation = "Precipitation",
+  snowfall = "Snowfall",
+  windsp = "Wind Speed",
+  visibility = "Visibility",
+  dew_point = "Dew Point"
+)
+
+
+library(plotly)
+
+# Get importance and relabel
+rf_imp <- importance(rf_model)
+rf_df <- data.frame(
+  Variable = rownames(rf_imp),
+  Importance = rf_imp[, "%IncMSE"],
+  stringsAsFactors = FALSE
+)
+rf_df$Variable <- var_labels[rf_df$Variable]  # Apply readable labels
+
+# Plot
+p_rf <- ggplot(rf_df, aes(x = reorder(Variable, Importance), y = Importance)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Random Forest Variable Importance",
+       x = "", y = "% Increase in MSE", caption = "Fig 6: Variable Importance for Random Forest") +
+  theme_minimal()
+
+p2 <-  ggplotly(p_rf)
+# XGB
+imp_xgb <- xgb.importance(model = xgb_model)
+
+# Relabel feature names
+imp_xgb$Feature <- var_labels[imp_xgb$Feature]
+
+# Plot
+p_xgb <- ggplot(imp_xgb, aes(x = reorder(Feature, Gain), y = Gain)) +
+  geom_bar(stat = "identity", fill = "darkorange") +
+  coord_flip() +
+  labs(title = "XGBoost Variable Importance", x = "", y = "Gain", caption = "Fig 7: XGBoost Variable Importance") +
+  theme_minimal()
+
+
+p3 <-  ggplotly(p_xgb)
+
+```
+
+
+```{r, echo=FALSE}
+p1
+```
+```{r, echo=FALSE}
+p2
+```
+```{r, echo=FALSE}
+p3
+```

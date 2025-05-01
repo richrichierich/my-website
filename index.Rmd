@@ -1,5 +1,5 @@
 ---
-title: "JSC370 Final Project"
+title: "JSC370 Lab 12"
 author: "Richard Guo"
 output:
   html_document:
@@ -7,7 +7,7 @@ output:
     toc_float: true
 ---
 
-This is my JSC370 Final Project website.
+Here are the plots from lab 12.
 ```{r setup, echo=FALSE}
 knitr::opts_chunk$set(eval = TRUE, echo  = FALSE, warning = FALSE, include = TRUE)
 suppressPackageStartupMessages({

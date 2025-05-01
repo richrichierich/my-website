@@ -1,9 +1,9 @@
-name: "my-website"
+name: "JSC370 Final Project - Richard Guo"
 output_dir: "."
 navbar:
-  title: "My Website"
+  title: "JSC370 Website - Richard Guo"
   left:
-    - text: "Home"
+    - text: "Lab 12"
       href: index.html
     - text: "Final Project"
       href: finalprojplots.html

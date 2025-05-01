@@ -1,5 +1,5 @@
 ---
-title: "JSC370 Final Project Plots"
+title: "JSC370 Final Project"
 author: "Richard Guo"
 output:
   html_document: default
@@ -21,6 +21,9 @@ suppressPackageStartupMessages({
   library(htmlwidgets)
 })
 ```
+Welcome to my final project for JSC370! Below is a link to the full report
+(I recommend the HTML as the PDF has some weird formatting for some of the
+figures), along with some of the interactive visuals you'll find in my report!
 [Download the full report (PDF)](JSCFinal.pdf)
 For better reading experience, [Download the full report (HTML)](JSCFinal.html)
 ```{r, echo = FALSE}
